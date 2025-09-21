@@ -32,7 +32,7 @@ if (empty($product_images) && !empty($product['image_filename'])) {
 }
 
 $reviews = [];
-$stmt_reviews = $conn->prepare("SELECT pr.*, u.name as user_name FROM product_reviews pr LEFT JOIN users u ON pr.user_id = u.id WHERE pr.product_id = ? AND pr.status = 'approved' ORDER BY pr.created_at DESC");
+$stmt_reviews = $conn->prepare("SELECT pr.*, CONCAT(u.first_name, ' ', u.last_name) as user_name FROM product_reviews pr LEFT JOIN users u ON pr.user_id = u.id WHERE pr.product_id = ? AND pr.status = 'approved' ORDER BY pr.created_at DESC");
 $stmt_reviews->bind_param("i", $product_id);
 $stmt_reviews->execute();
 $result_reviews = $stmt_reviews->get_result();

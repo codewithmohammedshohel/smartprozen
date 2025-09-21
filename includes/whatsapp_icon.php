@@ -1,5 +1,24 @@
 <?php
-$whatsapp_number = get_setting('whatsapp_number', $conn);
+// Get WhatsApp number with proper error handling
+$whatsapp_number = '';
+try {
+    if (function_exists('get_setting')) {
+        $whatsapp_number = get_setting('whatsapp_number', '', $conn);
+    } else {
+        // Fallback: get directly from database
+        $result = $conn->query("SELECT setting_value FROM settings WHERE setting_key = 'whatsapp_number' LIMIT 1");
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $whatsapp_number = $row['setting_value'] ?? '';
+        }
+    }
+} catch (Exception $e) {
+    $whatsapp_number = '';
+}
+
+// Clean the WhatsApp number (remove any non-digit characters except +)
+$whatsapp_number = preg_replace('/[^0-9+]/', '', $whatsapp_number);
+
 if (!empty($whatsapp_number)):
 ?>
 <style>

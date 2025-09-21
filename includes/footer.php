@@ -2,7 +2,15 @@
 
 <?php
 // Include the floating WhatsApp icon if enabled
-if (get_setting('whatsapp_number', $conn)) {
+$whatsapp_enabled = false;
+try {
+    $whatsapp_number = get_setting('whatsapp_number', '', $conn);
+    $whatsapp_enabled = !empty($whatsapp_number);
+} catch (Exception $e) {
+    $whatsapp_enabled = false;
+}
+
+if ($whatsapp_enabled) {
     require_once 'whatsapp_icon.php';
 }
 ?>
@@ -28,7 +36,7 @@ if (get_setting('whatsapp_number', $conn)) {
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/smartprozen/sw.js').catch(err => {
+                navigator.serviceWorker.register('<?php echo SITE_URL; ?>/sw.js').catch(err => {
                 console.error('ServiceWorker registration failed: ', err);
             });
         });

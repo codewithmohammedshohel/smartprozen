@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <!-- Admin CSS -->
-    <link rel="stylesheet" href="/smartprozen/css/admin.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/admin.css">
 
 
 </head>

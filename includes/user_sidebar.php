@@ -13,7 +13,7 @@ $nav_items = [
         <ul class="nav nav-pills flex-column mb-auto">
             <?php foreach ($nav_items as $file => $item): ?>
                 <li class="nav-item">
-                    <a href="/smartprozen/user/<?php echo $file; ?>" class="nav-link <?php echo ($current_page === $file) ? 'active' : 'text-dark'; ?>">
+                    <a href="<?php echo SITE_URL; ?>/user/<?php echo $file; ?>" class="nav-link <?php echo ($current_page === $file) ? 'active' : 'text-dark'; ?>">
                         <i class="bi <?php echo $item['icon']; ?> me-2"></i>
                         <?php echo $item['label']; ?>
                     </a>
@@ -21,7 +21,7 @@ $nav_items = [
             <?php endforeach; ?>
             <hr>
             <li class="nav-item">
-                <a href="/smartprozen/auth/logout.php" class="nav-link text-dark">
+                <a href="<?php echo SITE_URL; ?>/auth/logout.php" class="nav-link text-dark">
                     <i class="bi bi-box-arrow-left me-2"></i>
                     <?php echo __('logout'); ?>
                 </a>

@@ -17,11 +17,11 @@ if ($menu_result && $menu_result->num_rows > 0) {
 }
 
 // Get site settings
-$site_name = get_setting('site_name', 'SmartProZen');
-$site_description = get_setting('site_description', 'Smart Tech, Simplified Living');
-$contact_email = get_setting('contact_email', 'info@smartprozen.com');
-$contact_phone = get_setting('contact_phone', '+1 (555) 123-4567');
-$contact_address = get_setting('contact_address', '123 Tech Street, Innovation City, IC 12345');
+$site_name = get_setting('site_name', 'SmartProZen', $conn);
+$site_description = get_setting('site_description', 'Smart Tech, Simplified Living', $conn);
+$contact_email = get_setting('contact_email', 'info@smartprozen.com', $conn);
+$contact_phone = get_setting('contact_phone', '+1 (555) 123-4567', $conn);
+$contact_address = get_setting('contact_address', '123 Tech Street, Innovation City, IC 12345', $conn);
 
 // Footer layout
 $footer_layout = $theme_settings['footer_layout'] ?? 'default';
@@ -35,7 +35,7 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
             <div class="row py-4">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center">
-                        <img src="<?php echo SITE_URL . get_setting('site_logo', '/uploads/logos/logo.png'); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="30" class="me-2">
+                        <img src="<?php echo SITE_URL . get_setting('site_logo', '/uploads/logos/logo.png', $conn); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="30" class="me-2">
                         <span class="fw-bold"><?php echo htmlspecialchars($site_name); ?></span>
                     </div>
                     <p class="text-muted mb-0 mt-2"><?php echo htmlspecialchars($site_description ?? 'Smart Tech, Simplified Living'); ?></p>
@@ -50,7 +50,7 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
                 <!-- Company Info -->
                 <div class="col-lg-4 mb-4">
                     <div class="d-flex align-items-center mb-3">
-                        <img src="<?php echo SITE_URL . get_setting('site_logo', '/uploads/logos/logo.png'); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
+                        <img src="<?php echo SITE_URL . get_setting('site_logo', '/uploads/logos/logo.png', $conn); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
                         <h5 class="mb-0 fw-bold"><?php echo htmlspecialchars($site_name); ?></h5>
                     </div>
                     <p class="text-muted mb-3"><?php echo htmlspecialchars($site_description ?? 'Smart Tech, Simplified Living'); ?></p>

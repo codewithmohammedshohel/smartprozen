@@ -17,8 +17,8 @@ if ($menu_result && $menu_result->num_rows > 0) {
 }
 
 // Get site settings
-$site_name = get_setting('site_name', 'SmartProZen');
-$site_logo = get_setting('site_logo', '/uploads/logos/logo.png');
+$site_name = get_setting('site_name', 'SmartProZen', $conn);
+$site_logo = get_setting('site_logo', '/uploads/logos/logo.png', $conn);
 
 // Header layout
 $header_layout = $theme_settings['header_layout'] ?? 'default';
@@ -225,8 +225,18 @@ body {
                     <div class="dropdown">
                         <a class="btn btn-primary position-relative" href="<?php echo SITE_URL; ?>/cart/" data-bs-toggle="dropdown">
                             <i class="bi bi-cart"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count">
-                                <?php echo function_exists('get_cart_count') ? get_cart_count() : 0; ?>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count" id="cart-count">
+                                <?php 
+                                $cart_count = 0;
+                                if (function_exists('get_cart_count')) {
+                                    try {
+                                        $cart_count = get_cart_count();
+                                    } catch (Exception $e) {
+                                        $cart_count = 0;
+                                    }
+                                }
+                                echo $cart_count;
+                                ?>
                             </span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" style="width: 300px;">

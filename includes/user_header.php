@@ -8,18 +8,18 @@ $lang_code = 'en';
 load_language($lang_code);
 
 // Theme/Skin settings
-$theme_class = get_setting('theme_skin', $conn) ?? 'default'; // e.g., 'default', 'dark', 'corporate'
-$theme_stylesheet = "/smartprozen/css/{$theme_class}.css";
+$theme_class = get_setting('theme_skin', 'default', $conn); // e.g., 'default', 'dark', 'corporate'
+$theme_stylesheet = SITE_URL . "/css/{$theme_class}.css";
 
 // Google Fonts
-$google_font = get_setting('google_font', $conn);
+$google_font = get_setting('google_font', 'Poppins', $conn);
 
 // Custom CSS
-$custom_css = get_setting('custom_css', $conn);
+$custom_css = get_setting('custom_css', '', $conn);
 
 // SEO Variables
-$page_title = $page_title ?? get_translated_text(get_setting('business_name', $conn), 'business_name') ?? 'SmartProZen';
-$page_description = $page_description ?? get_translated_text(get_setting('site_description', $conn), 'site_description') ?? 'Your ultimate online shopping destination.';
+$page_title = $page_title ?? get_translated_text(get_setting('business_name', 'SmartProZen', $conn), 'business_name');
+$page_description = $page_description ?? get_translated_text(get_setting('site_description', 'Your ultimate online shopping destination.', $conn), 'site_description');
 
 ?>
 <!DOCTYPE html>
@@ -37,7 +37,7 @@ $page_description = $page_description ?? get_translated_text(get_setting('site_d
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <!-- Enhanced CSS -->
-    <link rel="stylesheet" href="/smartprozen/css/enhanced.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/enhanced.css">
 
     <!-- Google Font -->
     <?php if ($google_font): ?>
@@ -61,7 +61,7 @@ $page_description = $page_description ?? get_translated_text(get_setting('site_d
 <body class="d-flex flex-column min-vh-100">
 <header class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="/smartprozen/">
+        <a class="navbar-brand" href="<?php echo SITE_URL; ?>/">
             <?php
             $logo_path = get_setting('logo_path', $conn);
             $business_name_setting = get_setting('business_name', $conn);
@@ -88,12 +88,12 @@ $page_description = $page_description ?? get_translated_text(get_setting('site_d
                 echo generate_menu('main-menu', $conn);
             }
             ?>
-            <form class="d-flex ms-auto me-2" action="/smartprozen/index.php" method="GET">
+            <form class="d-flex ms-auto me-2" action="<?php echo SITE_URL; ?>/index.php" method="GET">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search">
                 <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
             </form>
             <div class="d-flex align-items-center">
-                <a href="/smartprozen/cart/" class="btn btn-outline-primary position-relative me-2">
+                <a href="<?php echo SITE_URL; ?>/cart/" class="btn btn-outline-primary position-relative me-2">
                     <?php echo __('cart'); ?>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         <?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>
@@ -103,15 +103,15 @@ $page_description = $page_description ?? get_translated_text(get_setting('site_d
                     <div class="dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><?php echo __('my_account'); ?></a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/smartprozen/user/dashboard.php"><?php echo __('dashboard'); ?></a></li>
-                            <li><a class="dropdown-item" href="/smartprozen/user/orders.php"><?php echo __('my_orders'); ?></a></li>
-                            <li><a class="dropdown-item" href="/smartprozen/user/profile.php"><?php echo __('profile'); ?></a></li>
+                            <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/dashboard.php"><?php echo __('dashboard'); ?></a></li>
+                            <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/orders.php"><?php echo __('my_orders'); ?></a></li>
+                            <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/profile.php"><?php echo __('profile'); ?></a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/smartprozen/auth/logout.php"><?php echo __('logout'); ?></a></li>
+                            <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/auth/logout.php"><?php echo __('logout'); ?></a></li>
                         </ul>
                     </div>
                 <?php else: ?>
-                    <a href="/smartprozen/auth/login.php" class="btn btn-primary"><?php echo __('login'); ?></a>
+                    <a href="<?php echo SITE_URL; ?>/auth/login.php" class="btn btn-primary"><?php echo __('login'); ?></a>
                 <?php endif; ?>
             </div>
         </div>

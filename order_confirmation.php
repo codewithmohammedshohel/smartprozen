@@ -8,7 +8,7 @@ if (!is_logged_in() || !isset($_GET['id'])) {
 
 $order_id = (int)$_GET['id'];
 
-$stmt = $conn->prepare("SELECT o.*, u.name as customer_name FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ? AND o.user_id = ?");
+$stmt = $conn->prepare("SELECT o.*, CONCAT(u.first_name, ' ', u.last_name) as customer_name FROM orders o LEFT JOIN users u ON o.user_id = u.id WHERE o.id = ? AND o.user_id = ?");
 $stmt->bind_param("ii", $order_id, $_SESSION['user_id']);
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();

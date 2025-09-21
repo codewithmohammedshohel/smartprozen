@@ -35,7 +35,7 @@ $order_info = $stmt->get_result()->fetch_assoc();
 $stmt->close();
     $user_id = $order_info['user_id'];
     
-    $stmt = $conn->prepare("SELECT name, email, whatsapp_number FROM users WHERE id = ?");
+    $stmt = $conn->prepare("SELECT CONCAT(first_name, ' ', last_name) as name, email, whatsapp_number FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
     $user_info = $stmt->get_result()->fetch_assoc();

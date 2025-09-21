@@ -16,7 +16,7 @@ $order_by_clause = "ORDER BY o.created_at DESC"; // Default sort
 $search_term = $_GET['search'] ?? '';
 if (!empty($search_term)) {
     $search_term_escaped = $conn->real_escape_string($search_term);
-    $where_clauses[] = "(o.id LIKE '%{$search_term_escaped}%' OR u.name LIKE '%{$search_term_escaped}%' OR u.email LIKE '%{$search_term_escaped}%')";
+    $where_clauses[] = "(o.id LIKE '%{$search_term_escaped}%' OR CONCAT(u.first_name, ' ', u.last_name) LIKE '%{$search_term_escaped}%' OR u.email LIKE '%{$search_term_escaped}%')";
 }
 
 // Handle status filter
@@ -44,7 +44,7 @@ if (!in_array($sort_order, $allowed_sort_order)) {
 $order_by_clause = "ORDER BY o.{$sort_by} {$sort_order}";
 
 // Construct the full query
-$sql = "SELECT o.*, u.name as customer_name, u.email as customer_email FROM orders o JOIN users u ON o.user_id = u.id";
+$sql = "SELECT o.*, CONCAT(u.first_name, ' ', u.last_name) as customer_name, u.email as customer_email FROM orders o LEFT JOIN users u ON o.user_id = u.id";
 
 if (!empty($where_clauses)) {
     $sql .= " WHERE " . implode(" AND ", $where_clauses);

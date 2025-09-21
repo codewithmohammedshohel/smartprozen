@@ -116,9 +116,18 @@ function get_all_settings($conn) {
     }
     return $settings;
 }
-function get_setting($key, $conn) {
+function get_setting($key, $default = null, $conn = null) {
+    // If $conn is not provided, try to get it from global or create new connection
+    if ($conn === null) {
+        global $conn;
+        if (!isset($conn)) {
+            require_once __DIR__ . '/db.php';
+            $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
+        }
+    }
+    
     $settings = get_all_settings($conn);
-    return $settings[$key] ?? null;
+    return $settings[$key] ?? $default;
 }
 
 // --- Authentication & Permissions (RBAC) ---

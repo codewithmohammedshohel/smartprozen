@@ -3,8 +3,35 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../core/db.php';
 require_once __DIR__ . '/../core/functions.php';
 
-// Get theme settings
-$settings = get_all_settings($conn);
+// Get theme settings with error handling
+$settings = [];
+try {
+    if (function_exists('get_all_settings')) {
+        $settings = get_all_settings($conn);
+    } else {
+        // Fallback: get settings directly from database
+        $result = $conn->query("SELECT setting_key, setting_value FROM settings");
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $settings[$row['setting_key']] = $row['setting_value'];
+            }
+        }
+    }
+} catch (Exception $e) {
+    // Use default settings if database fails
+    $settings = [
+        'site_name' => 'SmartProZen',
+        'site_description' => 'Smart Tech, Simplified Living',
+        'theme_primary_color' => '#007bff',
+        'theme_body_bg' => '#ffffff',
+        'theme_text_color' => '#212529',
+        'theme_font_family' => 'Poppins',
+        'theme_button_radius' => '4px',
+        'theme_card_radius' => '8px',
+        'theme_shadow' => '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)',
+        'google_font' => 'Poppins'
+    ];
+}
 
 // Theme customization
 $theme_primary_color = $settings['theme_primary_color'] ?? '#007bff';

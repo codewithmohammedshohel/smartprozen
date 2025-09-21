@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 // Fetch all reviews
 $reviews = [];
-$reviews_query = $conn->query("SELECT r.*, u.name as user_name, p.name as product_name FROM reviews r JOIN users u ON r.user_id = u.id JOIN products p ON r.product_id = p.id ORDER BY r.created_at DESC");
+$reviews_query = $conn->query("SELECT r.*, CONCAT(u.first_name, ' ', u.last_name) as user_name, p.name as product_name FROM reviews r LEFT JOIN users u ON r.user_id = u.id JOIN products p ON r.product_id = p.id ORDER BY r.created_at DESC");
 if ($reviews_query) {
     while ($row = $reviews_query->fetch_assoc()) {
         $reviews[] = $row;

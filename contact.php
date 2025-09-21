@@ -107,7 +107,7 @@ include 'includes/header.php';
                                     </div>
                                     <div>
                                         <h6 class="mb-0"><?php echo __('email'); ?></h6>
-                                        <p class="text-muted mb-0"><?php echo get_setting('business_email', $conn) ?: 'info@smartprozen.com'; ?></p>
+                                        <p class="text-muted mb-0"><?php echo get_setting('business_email', 'info@smartprozen.com', $conn); ?></p>
                                     </div>
                                 </div>
                                 
@@ -117,7 +117,7 @@ include 'includes/header.php';
                                     </div>
                                     <div>
                                         <h6 class="mb-0"><?php echo __('phone'); ?></h6>
-                                        <p class="text-muted mb-0"><?php echo get_setting('business_phone', $conn) ?: '+1-555-0123'; ?></p>
+                                        <p class="text-muted mb-0"><?php echo get_setting('business_phone', '+1-555-0123', $conn); ?></p>
                                     </div>
                                 </div>
                                 
@@ -127,7 +127,7 @@ include 'includes/header.php';
                                     </div>
                                     <div>
                                         <h6 class="mb-0"><?php echo __('address'); ?></h6>
-                                        <p class="text-muted mb-0"><?php echo get_translated_text(get_setting('business_address', $conn), 'business_address') ?: '123 Business Street, City, State 12345'; ?></p>
+                                        <p class="text-muted mb-0"><?php echo get_translated_text(get_setting('business_address', '123 Business Street, City, State 12345', $conn), 'business_address'); ?></p>
                                     </div>
                                 </div>
                                 
@@ -146,26 +146,34 @@ include 'includes/header.php';
                             
                             <h6 class="mb-3"><?php echo __('follow_us'); ?></h6>
                             <div class="social-links">
-                                <?php if (get_setting('social_facebook', $conn)): ?>
-                                    <a href="<?php echo get_setting('social_facebook', $conn); ?>" class="btn btn-outline-primary btn-sm me-2 mb-2" target="_blank">
+                                <?php 
+                                $social_facebook = get_setting('social_facebook', '', $conn);
+                                if (!empty($social_facebook)): ?>
+                                    <a href="<?php echo htmlspecialchars($social_facebook); ?>" class="btn btn-outline-primary btn-sm me-2 mb-2" target="_blank">
                                         <i class="bi bi-facebook"></i>
                                     </a>
                                 <?php endif; ?>
                                 
-                                <?php if (get_setting('social_twitter', $conn)): ?>
-                                    <a href="<?php echo get_setting('social_twitter', $conn); ?>" class="btn btn-outline-info btn-sm me-2 mb-2" target="_blank">
+                                <?php 
+                                $social_twitter = get_setting('social_twitter', '', $conn);
+                                if (!empty($social_twitter)): ?>
+                                    <a href="<?php echo htmlspecialchars($social_twitter); ?>" class="btn btn-outline-info btn-sm me-2 mb-2" target="_blank">
                                         <i class="bi bi-twitter"></i>
                                     </a>
                                 <?php endif; ?>
                                 
-                                <?php if (get_setting('social_instagram', $conn)): ?>
-                                    <a href="<?php echo get_setting('social_instagram', $conn); ?>" class="btn btn-outline-danger btn-sm me-2 mb-2" target="_blank">
+                                <?php 
+                                $social_instagram = get_setting('social_instagram', '', $conn);
+                                if (!empty($social_instagram)): ?>
+                                    <a href="<?php echo htmlspecialchars($social_instagram); ?>" class="btn btn-outline-danger btn-sm me-2 mb-2" target="_blank">
                                         <i class="bi bi-instagram"></i>
                                     </a>
                                 <?php endif; ?>
                                 
-                                <?php if (get_setting('social_linkedin', $conn)): ?>
-                                    <a href="<?php echo get_setting('social_linkedin', $conn); ?>" class="btn btn-outline-primary btn-sm me-2 mb-2" target="_blank">
+                                <?php 
+                                $social_linkedin = get_setting('social_linkedin', '', $conn);
+                                if (!empty($social_linkedin)): ?>
+                                    <a href="<?php echo htmlspecialchars($social_linkedin); ?>" class="btn btn-outline-primary btn-sm me-2 mb-2" target="_blank">
                                         <i class="bi bi-linkedin"></i>
                                     </a>
                                 <?php endif; ?>

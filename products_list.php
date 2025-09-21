@@ -90,7 +90,7 @@ include 'includes/header.php';
                             <div class="position-relative">
                                 <a href="product.php?id=<?php echo $product['id']; ?>" class="text-decoration-none">
                                     <img loading="lazy" 
-                                         src="<?php echo SITE_URL . '/uploads/media/thumb-' . htmlspecialchars($product['image_filename']); ?>" 
+                                         src="<?php echo SITE_URL . '/uploads/media/thumb-' . htmlspecialchars($product['featured_image'] ?? 'default-product.jpg'); ?>" 
                                          class="card-img-top" 
                                          alt="<?php echo htmlspecialchars(get_translated_text($product['name'], 'name')); ?>"
                                          style="height: 250px; object-fit: cover;">

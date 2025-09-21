@@ -5,12 +5,12 @@ require_once __DIR__ . '/../core/functions.php';
 
 // Authenticate and authorize admin
 if (!is_admin_logged_in()) {
-    header('Location: /smartprozen/admin/login.php');
+    header('Location: ' . SITE_URL . '/admin/login.php');
     exit;
 }
 if (!has_permission('view_dashboard')) { // Example permission
     $_SESSION['error_message'] = "You don't have permission to view the dashboard.";
-    header('Location: /smartprozen/admin/login.php'); // Redirect to admin login with error
+    header('Location: ' . SITE_URL . '/admin/login.php'); // Redirect to admin login with error
     exit;
 }
 
@@ -305,7 +305,7 @@ require_once __DIR__ . '/../includes/admin_sidebar.php';
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('salesChart').getContext('2d');
-        fetch('/smartprozen/api/sales_data.php')
+        fetch('<?php echo SITE_URL; ?>/api/sales_data.php')
             .then(response => response.json())
             .then(data => {
                 new Chart(ctx, {

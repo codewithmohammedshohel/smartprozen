@@ -38,7 +38,7 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
                         <img src="<?php echo SITE_URL . get_setting('site_logo', '/uploads/logos/logo.png'); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="30" class="me-2">
                         <span class="fw-bold"><?php echo htmlspecialchars($site_name); ?></span>
                     </div>
-                    <p class="text-muted mb-0 mt-2"><?php echo htmlspecialchars($site_description); ?></p>
+                    <p class="text-muted mb-0 mt-2"><?php echo htmlspecialchars($site_description ?? 'Smart Tech, Simplified Living'); ?></p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="mb-0">&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($site_name); ?>. All rights reserved.</p>
@@ -53,7 +53,7 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
                         <img src="<?php echo SITE_URL . get_setting('site_logo', '/uploads/logos/logo.png'); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
                         <h5 class="mb-0 fw-bold"><?php echo htmlspecialchars($site_name); ?></h5>
                     </div>
-                    <p class="text-muted mb-3"><?php echo htmlspecialchars($site_description); ?></p>
+                    <p class="text-muted mb-3"><?php echo htmlspecialchars($site_description ?? 'Smart Tech, Simplified Living'); ?></p>
                     
                     <!-- Social Links -->
                     <div class="social-links">
@@ -109,18 +109,18 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
                     <div class="contact-info">
                         <div class="d-flex align-items-center mb-2">
                             <i class="bi bi-geo-alt me-2" style="color: var(--primary-color);"></i>
-                            <span class="text-muted"><?php echo htmlspecialchars($contact_address); ?></span>
+                            <span class="text-muted"><?php echo htmlspecialchars($contact_address ?? '123 Tech Street, Innovation City, IC 12345'); ?></span>
                         </div>
                         <div class="d-flex align-items-center mb-2">
                             <i class="bi bi-telephone me-2" style="color: var(--primary-color);"></i>
-                            <a href="tel:<?php echo htmlspecialchars($contact_phone); ?>" class="text-muted text-decoration-none">
-                                <?php echo htmlspecialchars($contact_phone); ?>
+                            <a href="tel:<?php echo htmlspecialchars($contact_phone ?? '+1 (555) 123-4567'); ?>" class="text-muted text-decoration-none">
+                                <?php echo htmlspecialchars($contact_phone ?? '+1 (555) 123-4567'); ?>
                             </a>
                         </div>
                         <div class="d-flex align-items-center mb-2">
                             <i class="bi bi-envelope me-2" style="color: var(--primary-color);"></i>
-                            <a href="mailto:<?php echo htmlspecialchars($contact_email); ?>" class="text-muted text-decoration-none">
-                                <?php echo htmlspecialchars($contact_email); ?>
+                            <a href="mailto:<?php echo htmlspecialchars($contact_email ?? 'info@smartprozen.com'); ?>" class="text-muted text-decoration-none">
+                                <?php echo htmlspecialchars($contact_email ?? 'info@smartprozen.com'); ?>
                             </a>
                         </div>
                     </div>

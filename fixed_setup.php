@@ -402,6 +402,37 @@ try {
     // Insert homepage
     $conn->query("INSERT IGNORE INTO pages (id, title, slug, content, template_slug, meta_title, meta_description, is_published, is_homepage) VALUES (1, 'Home', 'home', '{}', 'default_page', 'SmartProZen - Smart Tech, Simplified Living', 'Discover our curated collection of smart gadgets and professional accessories designed to elevate your everyday.', 1, 1)");
     
+    // Insert homepage sections
+    $hero_content = json_encode([
+        'title' => 'Smart Tech, Simplified Living.',
+        'subtitle' => 'Discover our curated collection of smart gadgets and professional accessories designed to elevate your everyday.',
+        'button_text' => 'Shop Now',
+        'button_url' => '/products_list.php',
+        'background_image' => '',
+        'overlay_opacity' => 0.5
+    ]);
+    $conn->query("INSERT IGNORE INTO page_sections (page_id, section_type, title, content_json, display_order, is_active) VALUES (1, 'hero', 'Hero Section', '$hero_content', 1, 1)");
+    
+    $features_content = json_encode([
+        'title' => 'Why Choose SmartProZen?',
+        'subtitle' => 'We deliver premium quality products with exceptional service',
+        'features' => [
+            ['icon' => 'bi-gem', 'title' => 'Premium Quality', 'description' => 'We source and test every product to ensure it meets our high standards.'],
+            ['icon' => 'bi-truck', 'title' => 'Fast Shipping', 'description' => 'Get your order delivered quickly with our reliable shipping partners.'],
+            ['icon' => 'bi-shield-check', 'title' => 'Secure Checkout', 'description' => 'Your privacy and security are our top priority with encrypted payments.'],
+            ['icon' => 'bi-headset', 'title' => '24/7 Support', 'description' => 'Our dedicated support team is here to help you around the clock.']
+        ]
+    ]);
+    $conn->query("INSERT IGNORE INTO page_sections (page_id, section_type, title, content_json, display_order, is_active) VALUES (1, 'features', 'Features Section', '$features_content', 2, 1)");
+    
+    $products_content = json_encode([
+        'title' => 'Featured Products',
+        'subtitle' => 'Discover our most popular items',
+        'product_count' => 6,
+        'show_featured_only' => true
+    ]);
+    $conn->query("INSERT IGNORE INTO page_sections (page_id, section_type, title, content_json, display_order, is_active) VALUES (1, 'featured_products', 'Featured Products', '$products_content', 3, 1)");
+    
     // Insert sample categories
     $conn->query("INSERT IGNORE INTO product_categories (id, name, slug, description, display_order, is_active) VALUES (1, 'Smart Home Devices', 'smart-home', 'Transform your home with intelligent devices', 1, 1)");
     $conn->query("INSERT IGNORE INTO product_categories (id, name, slug, description, display_order, is_active) VALUES (2, 'Professional Audio', 'audio', 'Premium audio equipment for professionals', 2, 1)");

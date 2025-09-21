@@ -161,7 +161,7 @@ function get_current_admin() {
 function require_login() {
     if (!is_user_logged_in()) {
         $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
-        header('Location: /smartprozen/auth/login.php');
+        header('Location: ' . SITE_URL . '/auth/login.php');
         exit;
     }
 }
@@ -169,7 +169,7 @@ function require_login() {
 function require_admin_login() {
     if (!is_admin_logged_in()) {
         $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
-        header('Location: /smartprozen/admin/login.php');
+        header('Location: ' . SITE_URL . '/admin/login.php');
         exit;
     }
 }

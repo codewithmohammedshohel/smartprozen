@@ -11,23 +11,95 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Database configuration for XAMPP
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'smartprozen_db');
+/**
+ * Checks for an available MySQL port to avoid manual configuration changes.
+ *
+ * @return int The open port number (3307 or 3306).
+ */
+function getAvailableMySqlPort() {
+    // Array of ports to check, with your current port (3307) as the priority.
+    $ports = [3307, 3306];
+    $host = '127.0.0.1';
+    
+    foreach ($ports as $port) {
+        // Use a very short timeout (0.1 seconds) to avoid slowing down the page.
+        // The '@' suppresses connection error warnings, as we expect them to fail.
+        $connection = @fsockopen($host, $port, $errno, $errstr, 0.1);
 
-// Other configurations can go here
-// For example, site URL, default language, etc.
-define('SITE_URL', 'http://localhost/smartprozen');
+        // If the connection succeeds, we've found our port.
+        if (is_resource($connection)) {
+            fclose($connection); // Close the test connection immediately.
+            return $port;
+        }
+    }
+
+    // If neither port is open, return the default as a fallback.
+    return 3306;
+}
+
+// Auto-detect environment and configure accordingly
+function detectEnvironment() {
+    $server_name = $_SERVER['SERVER_NAME'] ?? '';
+    $http_host = $_SERVER['HTTP_HOST'] ?? '';
+    
+    // Check if we're on localhost (XAMPP/WAMP)
+    if (strpos($server_name, 'localhost') !== false || 
+        strpos($http_host, 'localhost') !== false || 
+        strpos($http_host, '127.0.0.1') !== false ||
+        strpos($http_host, '192.168.') !== false) {
+        return 'local';
+    }
+    
+    // Check if we're on a live domain (cPanel/shared hosting)
+    if (strpos($server_name, '.') !== false && 
+        !strpos($server_name, 'localhost') && 
+        !strpos($server_name, '127.0.0.1')) {
+        return 'production';
+    }
+    
+    return 'local'; // Default to local
+}
+
+$environment = detectEnvironment();
+
+// Database configuration based on environment
+if ($environment === 'local') {
+    // XAMPP/WAMP Local Development Configuration
+    define('DB_HOST', 'localhost');
+    define('DB_PORT', getAvailableMySqlPort()); // This now auto-detects the port
+    define('DB_USER', 'root');
+    define('DB_PASS', 'admin123');
+    define('DB_NAME', 'smartprozen_db');
+    
+    // Local site URL
+    define('SITE_URL', 'http://localhost/smartprozen');
+    
+    // Enable debug mode for local development
+    define('DEBUG', true);
+    
+} else {
+    // Production/cPanel Configuration
+    // These should be updated for your specific hosting environment
+    define('DB_HOST', 'localhost'); // Usually localhost on shared hosting
+    define('DB_PORT', '3306');
+    define('DB_USER', 'your_cpanel_db_user'); // Update this
+    define('DB_PASS', 'your_cpanel_db_password'); // Update this
+    define('DB_NAME', 'your_cpanel_db_name'); // Update this
+    
+    // Production site URL - Update this to your domain
+    define('SITE_URL', 'https://yourdomain.com'); // Update this
+    
+    // Disable debug mode for production
+    define('DEBUG', false);
+}
+
+// Other configurations
 define('DEFAULT_LANG', 'en');
+define('TIMEZONE', 'UTC');
 
 ini_set('display_errors', 0); // Disable display of errors in production
 ini_set('log_errors', 1); // Enable error logging
 ini_set('error_log', __DIR__ . '/../logs/php-error.log'); // Set error log file path
-
-// Define DEBUG constant
-define('DEBUG', true); // Set to false in production
 
 if (DEBUG) {
     ini_set('display_errors', 1);
@@ -80,11 +152,4 @@ function customExceptionHandler($exception) {
 
 set_error_handler("customErrorHandler");
 set_exception_handler("customExceptionHandler");
-
-// Error reporting
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-// IMPORTANT: In a production environment, set display_errors to 0 for security.
-// ini_set('display_errors', 0);
 ?>

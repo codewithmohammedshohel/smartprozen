@@ -39,34 +39,44 @@ require_once '../includes/admin_header.php';
         
         <?php show_flash_messages(); ?>
 
-        <?php while($gateway = $gateways->fetch_assoc()):
-            $settings = json_decode($gateway['settings_json'], true);
-        ?>
-        <div class="form-container gateway-form">
-            <form action="manage_gateways.php" method="POST">
-                <input type="hidden" name="gateway_id" value="<?php echo $gateway['id']; ?>">
-                <h3>
-                    <?php echo htmlspecialchars($gateway['name']); ?>
-                    (<?php echo ucfirst($gateway['type']); ?>)
-                </h3>
-                <label class="toggle-switch">
-                    <input type="checkbox" name="is_active" value="1" <?php if($gateway['is_active']) echo 'checked'; ?>>
-                    <span class="slider"></span>
-                    Enable Gateway
-                </label>
-                
-                <fieldset>
-                    <legend>Settings</legend>
-                    <?php foreach ($settings as $key => $value): ?>
-                        <label for="settings_<?php echo $key; ?>"><?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $key))); ?>:</label>
-                        <input type="text" id="settings_<?php echo $key; ?>" name="settings[<?php echo $key; ?>]" value="<?php echo htmlspecialchars($value); ?>">
-                    <?php endforeach; ?>
-                </fieldset>
-                
-                <button type="submit" class="btn">Save Changes</button>
-            </form>
+        <div class="gateway-grid">
+            <?php while($gateway = $gateways->fetch_assoc()):
+                $settings = json_decode($gateway['settings_json'] ?? '{}', true);
+            ?>
+            <div class="card gateway-card">
+                <form action="manage_gateways.php" method="POST">
+                    <div class="card-header">
+                        <h3 class="card-title"><?php echo htmlspecialchars($gateway['name']); ?></h3>
+                        <label class="toggle-switch">
+                            <input type="checkbox" name="is_active" value="1" <?php if($gateway['is_active']) echo 'checked'; ?>>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" name="gateway_id" value="<?php echo $gateway['id']; ?>">
+                        <p class="text-muted"><?php echo htmlspecialchars(ucfirst($gateway['type'] ?? 'N/A')); ?> Gateway</p>
+                        
+                        <fieldset>
+                            <legend>Settings</legend>
+                            <?php if (empty($settings)): ?>
+                                <p class="text-muted">This gateway requires no additional settings.</p>
+                            <?php else: ?>
+                                <?php foreach ($settings as $key => $value): ?>
+                                    <div class="form-group">
+                                        <label for="settings_<?php echo $gateway['id'] . '_' . $key; ?>"><?php echo htmlspecialchars(ucfirst(str_replace('_', ' ', $key))); ?>:</label>
+                                        <input type="text" class="form-control" id="settings_<?php echo $gateway['id'] . '_' . $key; ?>" name="settings[<?php echo $key; ?>]" value="<?php echo htmlspecialchars($value); ?>">
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </fieldset>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+            <?php endwhile; ?>
         </div>
-        <?php endwhile; ?>
     </div>
 </div>
 <?php require_once '../includes/admin_footer.php'; ?>

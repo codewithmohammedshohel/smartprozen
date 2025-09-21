@@ -2,6 +2,7 @@
 require_once '../config.php';
 require_once '../core/db.php';
 require_once '../core/functions.php';
+require_once '../core/whatsapp_handler.php';
 require_once '../core/email_handler.php';
 
 if (!is_admin_logged_in() || !has_permission('manage_orders')) {
@@ -34,20 +35,31 @@ $order_info = $stmt->get_result()->fetch_assoc();
 $stmt->close();
     $user_id = $order_info['user_id'];
     
-    $stmt = $conn->prepare("SELECT name, email FROM users WHERE id = ?");
+    $stmt = $conn->prepare("SELECT name, email, whatsapp_number FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$user_info = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+    $user_info = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
     
-    $stmt = $conn->prepare("SELECT product_id FROM order_items WHERE order_id = ?");
-$stmt->bind_param("i", $order_id);
-$stmt->execute();
-$order_items = $stmt->get_result();
-$stmt->close();
+    $whatsapp_number = $user_info['whatsapp_number'];
     
-    $download_stmt = $conn->prepare("INSERT INTO downloads (user_id, product_id, order_id, download_token) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("SELECT p.name, p.id as product_id FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
+    $order_items = $stmt->get_result();
+    $stmt->close();
     
+    $download_links = [];
+    while ($item = $order_items->fetch_assoc()) {
+        $download_links[] = get_translated_text($item['name'], 'name') . ": " . SITE_URL . '/download.php?id=' . $item['product_id'];
+    }
+    
+    if (!empty($whatsapp_number)) {
+        $message = "Your order #$order_id is complete!\n\nDownload your products:\n" . implode("\n", $download_links);
+        send_whatsapp_message($whatsapp_number, $message);
+    }
+    
+    $download_stmt = $conn->prepare("INSERT INTO downloads (user_id, product_id, order_id) VALUES (?, ?, ?)");    
     while ($item = $order_items->fetch_assoc()) {
         $product_id = $item['product_id'];
         // Check if a download link already exists for this user/product/order to prevent duplicates
@@ -57,8 +69,8 @@ $stmt->execute();
 $check_exists = $stmt->get_result()->num_rows;
 $stmt->close();
         if($check_exists == 0) {
-            $token = bin2hex(random_bytes(32));
-            $download_stmt->bind_param("iiis", $user_id, $product_id, $order_id, $token);
+            // $token = bin2hex(random_bytes(32)); // No longer needed if download_token column is removed
+            $download_stmt->bind_param("iii", $user_id, $product_id, $order_id); // Changed "iiis" to "iii"
             $download_stmt->execute();
         }
     }

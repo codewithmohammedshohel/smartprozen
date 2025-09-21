@@ -1,58 +1,107 @@
 <?php
-// This should be included after config.php and db.php is available as $conn
+// core/functions.php
 
-// --- Language & Translation ---
-$GLOBALS['lang'] = [];
-function load_language($lang_code) { // Removed default value
-    $lang_file = __DIR__ . "/../lang/{$lang_code}.json";
-    if (file_exists($lang_file)) {
-        $GLOBALS['lang'] = json_decode(file_get_contents($lang_file), true);
+// ... existing functions ...
+
+/**
+ * Resizes and saves an uploaded image, creating a full-size version and a thumbnail.
+ *
+ * @param array $file The uploaded file array from $_FILES.
+ * @param string $target_dir The directory to save the images in.
+ * @param int $full_width The width for the full-size image.
+ * @param int $thumb_width The width for the thumbnail image.
+ * @return string|false The new filename on success, false on failure.
+ */
+function resize_and_save_image($file, $target_dir, $full_width = 800, $thumb_width = 150) {
+    $filename = uniqid() . '-' . basename($file["name"]);
+    $target_file = $target_dir . $filename;
+    $thumb_file = $target_dir . 'thumb-' . $filename;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+    // Check if image file is a actual image or fake image
+    if (getimagesize($file["tmp_name"]) === false) {
+        return false;
     }
+
+    // Create image resource
+    $source_image = null;
+    if ($imageFileType == "jpg" || $imageFileType == "jpeg") {
+        $source_image = imagecreatefromjpeg($file["tmp_name"]);
+    } elseif ($imageFileType == "png") {
+        $source_image = imagecreatefrompng($file["tmp_name"]);
+    } elseif ($imageFileType == "gif") {
+        $source_image = imagecreatefromgif($file["tmp_name"]);
+    }
+
+    if (!$source_image) {
+        return false;
+    }
+
+    $width = imagesx($source_image);
+    $height = imagesy($source_image);
+
+    // --- Create and save full-size image ---
+    $full_height = floor($height * ($full_width / $width));
+    $virtual_image = imagecreatetruecolor($full_width, $full_height);
+    imagecopyresampled($virtual_image, $source_image, 0, 0, 0, 0, $full_width, $full_height, $width, $height);
+    imagejpeg($virtual_image, $target_file, 85); // Save with 85% quality
+
+    // --- Create and save thumbnail ---
+    $thumb_height = floor($height * ($thumb_width / $width));
+    $virtual_thumb = imagecreatetruecolor($thumb_width, $thumb_height);
+    imagecopyresampled($virtual_thumb, $source_image, 0, 0, 0, 0, $thumb_width, $thumb_height, $width, $height);
+    imagejpeg($virtual_thumb, $thumb_file, 80); // Save with 80% quality
+
+    imagedestroy($source_image);
+    imagedestroy($virtual_image);
+    imagedestroy($virtual_thumb);
+
+    return $filename;
 }
+
+/**
+ * Clears the PWA cache by updating the service worker cache version.
+ */
+function clear_pwa_cache() {
+    $sw_file = __DIR__ . '/../sw.js';
+    if (file_exists($sw_file)) {
+        $content = file_get_contents($sw_file);
+        $content = preg_replace_callback(
+            "/const CACHE_NAME = 'smartprozen-cache-v(\d+)';/",
+            function($matches) {
+                $version = (int)$matches[1] + 1;
+                return "const CACHE_NAME = 'smartprozen-cache-v{$version}';";
+            },
+            $content
+        );
+        file_put_contents($sw_file, $content);
+        return true;
+    }
+    return false;
+}
+
+// ... rest of the file ...
+
+// --- Language & Translation (Feature Disabled) ---
 function __($key) {
-    // Ensure language is loaded only once per request
-    if (empty($GLOBALS['lang']) && isset($_SESSION['lang'])) {
-        load_language($_SESSION['lang']);
-    } elseif (empty($GLOBALS['lang'])) {
-        load_language(DEFAULT_LANG); // Fallback to default from config
-    }
-    return $GLOBALS['lang'][$key] ?? ucwords(str_replace('_', ' ', $key));
+    return ucwords(str_replace('_', ' ', $key));
 }
-function get_translated_text($json_string, $key_prefix = '') {
-    if (empty($json_string)) return '';
-    
-    // Handle if it's already an array
-    if (is_array($json_string)) {
-        $data = $json_string;
-    } else {
-        // Try to decode JSON
-        $data = json_decode($json_string, true);
-        if (!is_array($data)) {
-            // If it's not JSON and not an array, return as string
-            return is_string($json_string) ? $json_string : '';
-        }
-    }
-    
-    $lang = $_SESSION['lang'] ?? DEFAULT_LANG; // Use DEFAULT_LANG from config
-    
-    // For simple {en: 'text', bn: 'text'} structure
-    if (isset($data[$lang]) && is_string($data[$lang])) return $data[$lang];
-    if (isset($data['en']) && is_string($data['en'])) return $data['en']; // English fallback
 
-    // For complex {title_en: 'text', title_bn: 'text'} structure
-    $key_lang = $key_prefix . '_' . $lang;
-    $key_en = $key_prefix . '_en'; 
-    if (isset($data[$key_lang]) && !empty($data[$key_lang]) && is_string($data[$key_lang])) return $data[$key_lang];
-    if (isset($data[$key_en]) && !empty($data[$key_en]) && is_string($data[$key_en])) return $data[$key_en];
-    
-    // If we have any string value in the array, return the first one
-    foreach ($data as $value) {
-        if (is_string($value) && !empty($value)) {
-            return $value;
-        }
+// This function is kept for theme compatibility after disabling the language feature.
+function get_translated_text($data, $key = '') {
+    if (is_array($data)) {
+        return $data[$key] ?? null;
     }
-    
-    return '...';
+    if (is_string($data)) {
+        // Check if the string is JSON
+        $decoded = json_decode($data, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            // If JSON, return the 'en' key if it exists, or the first element, or the original string
+            return $decoded['en'] ?? reset($decoded) ?? $data;
+        }
+        return $data; // It's a plain string
+    }
+    return null;
 }
 
 // --- Settings ---
@@ -218,15 +267,26 @@ function slugify($text) {
     $text = trim($text, '-');
     $text = preg_replace('~-+~', '-', $text);
     $text = strtolower($text);
-    return empty($text) ? 'n-a' : $text;
+    return $text;
+}
+
+/**
+ * Checks if a string is a valid JSON.
+ *
+ * @param string $string The string to check.
+ * @return bool True if the string is valid JSON, false otherwise.
+ */
+function is_json($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
 }
 function show_flash_messages() {
     if (isset($_SESSION['success_message'])) {
-        echo '<div class="flash-message success">' . htmlspecialchars($_SESSION['success_message']) . '</div>';
+        echo '<div class="alert alert-success alert-dismissible fade show" role="alert">' . htmlspecialchars($_SESSION['success_message']) . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         unset($_SESSION['success_message']);
     }
     if (isset($_SESSION['error_message'])) {
-        echo '<div class="flash-message error">' . htmlspecialchars($_SESSION['error_message']) . '</div>';
+        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">' . htmlspecialchars($_SESSION['error_message']) . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         unset($_SESSION['error_message']);
     }
 }

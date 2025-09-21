@@ -9,10 +9,13 @@ $email = ''; // Initialize $email
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
+    $address = trim($_POST['address'] ?? '');
+    $contact_number = trim($_POST['contact_number'] ?? '');
+    $whatsapp_number = trim($_POST['whatsapp_number'] ?? '');
     $password = $_POST['password'] ?? '';
     $password_confirm = $_POST['password_confirm'] ?? '';
 
-    if (empty($name) || empty($email) || empty($password) || empty($password_confirm)) {
+    if (empty($name) || empty($email) || empty($address) || empty($contact_number) || empty($password) || empty($password_confirm)) {
         $error_message = 'Please fill in all fields.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = 'Please enter a valid email address.';
@@ -34,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
             // Insert new user
-            $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $name, $email, $hashed_password);
+            $stmt = $conn->prepare("INSERT INTO users (name, email, password, address, contact_number, whatsapp_number) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $name, $email, $hashed_password, $address, $contact_number, $whatsapp_number);
 
             if ($stmt->execute()) {
                 // Automatically log in the new user
@@ -67,6 +70,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="form-floating mb-3">
                             <input class="form-control" id="inputEmail" type="email" name="email" placeholder="name@example.com" value="<?php echo htmlspecialchars($email); ?>" required />
                             <label for="inputEmail"><?php echo __('email_address'); ?></label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="inputAddress" type="text" name="address" placeholder="Enter your address" required />
+                            <label for="inputAddress"><?php echo __('address'); ?></label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="inputContactNumber" type="text" name="contact_number" placeholder="Enter your contact number" required />
+                            <label for="inputContactNumber"><?php echo __('contact_number'); ?></label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="inputWhatsappNumber" type="text" name="whatsapp_number" placeholder="Enter your WhatsApp number" />
+                            <label for="inputWhatsappNumber"><?php echo __('whatsapp_number'); ?></label>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">

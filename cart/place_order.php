@@ -7,12 +7,6 @@ header('Content-Type: application/json'); // Set header for JSON response
 
 $response = ['success' => false, 'message' => '', 'order_id' => null];
 
-if (!is_logged_in()) {
-    $response['message'] = 'Please log in to place an order.';
-    echo json_encode($response);
-    exit;
-}
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $response['message'] = 'Invalid request method.';
     echo json_encode($response);
@@ -31,22 +25,52 @@ $shipping_email = $_POST['email'] ?? '';
 $shipping_address = $_POST['address'] ?? '';
 $shipping_city = $_POST['city'] ?? '';
 $shipping_zip = $_POST['zip'] ?? '';
+$shipping_contact_number = $_POST['contact_number'] ?? '';
+$shipping_whatsapp_number = $_POST['whatsapp_number'] ?? '';
 $payment_method = $_POST['payment_method'] ?? '';
 
 // Basic validation
-if (empty($shipping_name) || empty($shipping_email) || empty($shipping_address) || empty($shipping_city) || empty($shipping_zip) || empty($payment_method)) {
+if (empty($shipping_name) || empty($shipping_email) || empty($shipping_address) || empty($shipping_city) || empty($shipping_zip) || empty($shipping_contact_number) || empty($payment_method)) {
     $response['message'] = 'All shipping and payment fields are required.';
     echo json_encode($response);
     exit;
 }
 
+$user_id = null;
+if (is_logged_in()) {
+    $user_id = $_SESSION['user_id'];
+} else {
+    // Guest user, check if user exists or create a new one
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->bind_param("s", $shipping_email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $user_id = $user['id'];
+    } else {
+        // Create a new user
+        $password = bin2hex(random_bytes(8)); // Generate a random password
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("INSERT INTO users (name, email, password, address, contact_number, whatsapp_number) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssss", $shipping_name, $shipping_email, $hashed_password, $shipping_address, $shipping_contact_number, $shipping_whatsapp_number);
+        $stmt->execute();
+        $user_id = $stmt->insert_id;
+
+        // Log the new user in
+        $_SESSION['user_id'] = $user_id;
+    }
+}
+
 $user_id = $_SESSION['user_id'];
 $cart_items = [];
 $subtotal = 0;
+$all_digital = true;
+$any_manual = false;
 
 $product_ids = array_keys($_SESSION['cart']);
 $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
-$stmt = $conn->prepare("SELECT id, name, price, image_filename FROM products WHERE id IN ($placeholders)");
+$stmt = $conn->prepare("SELECT id, name, price, image_filename, is_digital, delivery_type FROM products WHERE id IN ($placeholders)");
 $stmt->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -54,19 +78,34 @@ while ($product = $result->fetch_assoc()) {
     $product['quantity'] = $_SESSION['cart'][$product['id']];
     $cart_items[] = $product;
     $subtotal += $product['price'] * $product['quantity'];
+    $all_digital = $product['is_digital'] && $all_digital;
+    if ($product['delivery_type'] === 'manual') {
+        $any_manual = true;
+    }
 }
 $stmt->close();
 
 $discount = $_SESSION['discount_amount'] ?? 0;
 $total = $subtotal - $discount;
 
+if ($any_manual) {
+    $order_status = 'Processing';
+} elseif ($all_digital) {
+    $order_status = 'Completed';
+} else {
+    $order_status = 'Pending';
+}
+
 // Start transaction
 $conn->begin_transaction();
 
 try {
+    // Generate a unique order number
+    $order_number = 'ORD-' . strtoupper(uniqid()) . rand(1000, 9999);
+
     // Create the order
-    $stmt = $conn->prepare("INSERT INTO orders (user_id, total_amount, status, shipping_name, shipping_email, shipping_address, shipping_city, shipping_zip, payment_method) VALUES (?, ?, 'Pending', ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("idssssss", $user_id, $total, $shipping_name, $shipping_email, $shipping_address, $shipping_city, $shipping_zip, $payment_method);
+    $stmt = $conn->prepare("INSERT INTO orders (order_number, user_id, total_amount, status, shipping_name, shipping_email, shipping_address, shipping_city, shipping_zip, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sidsssssss", $order_number, $user_id, $total, $order_status, $shipping_name, $shipping_email, $shipping_address, $shipping_city, $shipping_zip, $payment_method);
     $stmt->execute();
     $order_id = $stmt->insert_id;
     $stmt->close();

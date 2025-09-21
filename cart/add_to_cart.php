@@ -27,7 +27,12 @@ if (isset($_SESSION['cart'][$product_id])) {
 
 $response['success'] = true;
 $response['message'] = "Product added to cart!";
-$response['cart_count'] = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; // Return updated cart count
+$total_items = 0;
+foreach ($_SESSION['cart'] as $qty) {
+    $total_items += $qty;
+}
+$response['cart_count'] = $total_items; // Return updated cart count
+$response['product_quantity'] = $_SESSION['cart'][$product_id]; // Return quantity of this specific product
 
 echo json_encode($response);
 exit;

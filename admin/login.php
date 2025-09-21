@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['admin_role_id'] = $admin['role_id'];
                     
                     // Log successful login
+                    log_activity('admin', $admin['id'], 'admin_login', "Admin {$admin['username']} logged in successfully.");
                     error_log("Admin login successful: {$username} from IP: {$ip}");
                     
                     // Redirect to intended page or dashboard

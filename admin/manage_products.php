@@ -8,28 +8,101 @@ if (!is_admin_logged_in() || !has_permission('manage_products')) {
     exit;
 }
 
+// Handle DELETE request
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $product_id = (int)$_GET['id'];
+
+    // Check for associated order items
+    $check_stmt = $conn->prepare("SELECT COUNT(*) FROM order_items WHERE product_id = ?");
+    $check_stmt->bind_param("i", $product_id);
+    $check_stmt->execute();
+    $order_items_count = $check_stmt->get_result()->fetch_row()[0];
+    $check_stmt->close();
+
+    if ($order_items_count > 0) {
+        $_SESSION['error_message'] = "Cannot delete product because it has associated order items. Please remove order items first or consider soft-deleting the product.";
+    } else {
+        // Start a transaction for atomicity
+        $conn->begin_transaction();
+        $deletion_successful = true;
+
+        try {
+            // 1. Delete associated product images and physical files
+            $gallery_images_stmt = $conn->prepare("SELECT image_filename FROM product_images WHERE product_id = ?");
+            $gallery_images_stmt->bind_param("i", $product_id);
+            $gallery_images_stmt->execute();
+            $result_images = $gallery_images_stmt->get_result();
+            while ($image = $result_images->fetch_assoc()) {
+                $file_path = __DIR__ . "/../uploads/media/" . $image['image_filename'];
+                if (file_exists($file_path)) {
+                    unlink($file_path);
+                }
+            }
+            $gallery_images_stmt->close();
+            $stmt = $conn->prepare("DELETE FROM product_images WHERE product_id = ?");
+            $stmt->bind_param("i", $product_id);
+            $stmt->execute();
+
+            // 2. Delete associated reviews
+            $stmt = $conn->prepare("DELETE FROM reviews WHERE product_id = ?");
+            $stmt->bind_param("i", $product_id);
+            $stmt->execute();
+
+            // 3. Delete associated wishlist entries
+            $stmt = $conn->prepare("DELETE FROM wishlist WHERE product_id = ?");
+            $stmt->bind_param("i", $product_id);
+            $stmt->execute();
+
+            // 4. Delete associated SEO metadata
+            $stmt = $conn->prepare("DELETE FROM seo_metadata WHERE entity_type = 'product' AND entity_id = ?");
+            $stmt->bind_param("i", $product_id);
+            $stmt->execute();
+
+            // 5. Delete the product itself
+            $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+            $stmt->bind_param("i", $product_id);
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+                $conn->commit(); // Commit transaction
+                log_activity('admin', $_SESSION['admin_id'], 'product_delete', "Deleted product ID: {$product_id} and all related data.");
+                $_SESSION['success_message'] = "Product and all related data deleted successfully.";
+            } else {
+                $conn->rollback(); // Rollback if product not found/deleted
+                $_SESSION['error_message'] = "Failed to delete product or product not found.";
+                $deletion_successful = false;
+            }
+        } catch (Exception $e) {
+            $conn->rollback(); // Rollback on any error
+            $_SESSION['error_message'] = "An error occurred during product deletion: " . $e->getMessage();
+            $deletion_successful = false;
+        }
+    }
+    header('Location: manage_products.php');
+    exit;
+}
+
 // Handle POST request for Add/Edit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_id = $_POST['product_id'] ?? null;
 
-    // Prepare bilingual data
-    $name_json = json_encode(['en' => $_POST['name_en'], 'bn' => $_POST['name_bn']]);
-    $description_json = json_encode(['en' => $_POST['description_en'], 'bn' => $_POST['description_bn']]);
+    $name = $_POST['name'];
+    $description = $_POST['description'];
     $price = $_POST['price'];
 
     // Handle main product image upload
     $image_filename = $_POST['existing_image_filename'] ?? null;
     if (isset($_FILES['main_image']) && $_FILES['main_image']['error'] == 0) {
         $target_dir = __DIR__ . "/../uploads/media/";
-        $new_filename = uniqid() . '-' . basename($_FILES["main_image"]["name"]);
-        if (move_uploaded_file($_FILES["main_image"]["tmp_name"], $target_dir . $new_filename)) {
+        $new_filename = resize_and_save_image($_FILES['main_image'], $target_dir);
+        if ($new_filename) {
             $image_filename = $new_filename;
-            // Optionally create a thumbnail here
         }
     }
 
     // Handle digital file upload
     $digital_file_path = $_POST['existing_digital_file'] ?? null;
+    $delivery_type = $_POST['delivery_type'] ?? 'automatic';
     if (isset($_FILES['digital_file']) && $_FILES['digital_file']['error'] == 0) {
         $target_dir = __DIR__ . "/../uploads/files/";
         $new_filename = uniqid() . '-' . basename($_FILES["digital_file"]["name"]);
@@ -39,13 +112,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if ($product_id) { // Update existing product
-        $stmt = $conn->prepare("UPDATE products SET name=?, description=?, price=?, image_filename=?, digital_file_path=? WHERE id=?");
-        $stmt->bind_param("ssds_si", $name_json, $description_json, $price, $image_filename, $digital_file_path, $product_id);
+        $stmt = $conn->prepare("UPDATE products SET name=?, description=?, price=?, image_filename=?, digital_file_path=?, delivery_type=? WHERE id=?");
+        $stmt->bind_param("ssdsssi", $name, $description, $price, $image_filename, $digital_file_path, $delivery_type, $product_id);
         $stmt->execute();
         log_activity('admin', $_SESSION['admin_id'], 'product_update', "Updated product ID: {$product_id}");
     } else { // Insert new product
-        $stmt = $conn->prepare("INSERT INTO products (name, description, price, image_filename, digital_file_path) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssds_s", $name_json, $description_json, $price, $image_filename, $digital_file_path);
+        $stmt = $conn->prepare("INSERT INTO products (name, description, price, image_filename, digital_file_path, delivery_type) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssdsss", $name, $description, $price, $image_filename, $digital_file_path, $delivery_type);
         $stmt->execute();
         $product_id = $conn->insert_id;
         log_activity('admin', $_SESSION['admin_id'], 'product_create', "Created product ID: {$product_id}");
@@ -56,8 +129,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($_FILES['gallery_images']['tmp_name'] as $key => $tmp_name) {
             if ($_FILES['gallery_images']['error'][$key] == 0) {
                 $target_dir = __DIR__ . "/../uploads/media/";
-                $new_filename = uniqid() . '-' . basename($_FILES['gallery_images']['name'][$key]);
-                if (move_uploaded_file($tmp_name, $target_dir . $new_filename)) {
+                $file_to_upload = [
+                    'name' => $_FILES['gallery_images']['name'][$key],
+                    'tmp_name' => $tmp_name,
+                ];
+                $new_filename = resize_and_save_image($file_to_upload, $target_dir);
+                if ($new_filename) {
                     $stmt = $conn->prepare("INSERT INTO product_images (product_id, image_filename) VALUES (?, ?)");
                     $stmt->bind_param("is", $product_id, $new_filename);
                     $stmt->execute();
@@ -121,7 +198,7 @@ require_once __DIR__ . '/../includes/admin_sidebar.php';
                                 <thead>
                                     <tr>
                                         <th>Image</th>
-                                        <th>Name (English)</th>
+                                        <th>Name</th>
                                         <th>Price</th>
                                         <th>Actions</th>
                                     </tr>
@@ -130,7 +207,7 @@ require_once __DIR__ . '/../includes/admin_sidebar.php';
                                     <?php while($product = $products->fetch_assoc()): ?>
                                     <tr>
                                         <td><img src="<?php echo SITE_URL . '/uploads/media/thumb-' . htmlspecialchars($product['image_filename']); ?>" alt="" width="50"></td>
-                                        <td><?php echo htmlspecialchars(get_translated_text($product['name'], 'name')); ?></td>
+                                        <td><?php echo htmlspecialchars($product['name']); ?></td>
                                         <td>$<?php echo number_format($product['price'], 2); ?></td>
                                         <td>
                                             <a href="manage_products.php?action=edit&id=<?php echo $product['id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
@@ -168,25 +245,25 @@ $stmt->close();
                             <input type="hidden" name="product_id" value="<?php echo $product['id'] ?? ''; ?>">
                             
                             <div class="mb-3">
-                                <label for="name_en" class="form-label">Product Name (English)</label>
-                                <input type="text" id="name_en" name="name_en" class="form-control" value="<?php echo htmlspecialchars(json_decode($product['name'] ?? '""' , true)['en'] ?? ''); ?>" required>
+                                <label for="name" class="form-label">Product Name</label>
+                                <input type="text" id="name" name="name" class="form-control" value="<?php echo htmlspecialchars($product['name'] ?? ''); ?>" required>
                             </div>
                             <div class="mb-3">
-                                <label for="name_bn" class="form-label">Product Name (Bangla)</label>
-                                <input type="text" id="name_bn" name="name_bn" class="form-control" value="<?php echo htmlspecialchars(json_decode($product['name'] ?? '""' , true)['bn'] ?? ''); ?>" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="description_en" class="form-label">Description (English)</label>
-                                <textarea class="form-control tinymce" id="description_en" name="description_en" rows="5"><?php echo htmlspecialchars(json_decode($product['description'] ?? '""' , true)['en'] ?? ''); ?></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="description_bn" class="form-label">Description (Bangla)</label>
-                                <textarea class="form-control tinymce" id="description_bn" name="description_bn" rows="5"><?php echo htmlspecialchars(json_decode($product['description'] ?? '""' , true)['bn'] ?? ''); ?></textarea>
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control tinymce" id="description" name="description" rows="5"><?php echo htmlspecialchars($product['description'] ?? ''); ?></textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label for="price" class="form-label">Price ($)</label>
                                 <input type="number" step="0.01" id="price" name="price" class="form-control" value="<?php echo $product['price'] ?? '0.00'; ?>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="delivery_type" class="form-label">Delivery Type</label>
+                                <select id="delivery_type" name="delivery_type" class="form-select">
+                                    <option value="automatic" <?php echo (isset($product['delivery_type']) && $product['delivery_type'] === 'automatic') ? 'selected' : ''; ?>>Automatic</option>
+                                    <option value="manual" <?php echo (isset($product['delivery_type']) && $product['delivery_type'] === 'manual') ? 'selected' : ''; ?>>Manual</option>
+                                </select>
                             </div>
                             
                             <div class="mb-3">

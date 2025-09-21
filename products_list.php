@@ -67,7 +67,7 @@ include 'includes/header.php';
             $types = '';
 
             if (!empty($search_term)) {
-                $sql .= " AND (JSON_EXTRACT(name, '$.en') LIKE ? OR JSON_EXTRACT(description, '$.en') LIKE ?)";
+                $sql .= " AND (name LIKE ? OR description LIKE ?)";
                 $params[] = '%' . $search_term . '%';
                 $params[] = '%' . $search_term . '%';
                 $types .= 'ss';
@@ -97,6 +97,7 @@ include 'includes/header.php';
                                 </a>
                                 <div class="position-absolute top-0 end-0 p-2">
                                     <span class="badge bg-success">New</span>
+                                    <span class="badge bg-info product-cart-quantity-badge" id="product-quantity-<?php echo $product['id']; ?>" style="display: none;">0</span>
                                 </div>
                             </div>
                             <div class="card-body d-flex flex-column p-4">
@@ -112,14 +113,18 @@ include 'includes/header.php';
                                     <div class="price-section">
                                         <span class="h4 text-primary fw-bold mb-0">$<?php echo number_format($product['price'], 2); ?></span>
                                     </div>
+                                    <div class="input-group input-group-sm" style="width: 100px;">
+                                        <button class="btn btn-outline-secondary quantity-minus" type="button" data-product-id="<?php echo $product['id']; ?>">-</button>
+                                        <input type="number" class="form-control text-center product-quantity-input" value="1" min="1" data-product-id="<?php echo $product['id']; ?>">
+                                        <button class="btn btn-outline-secondary quantity-plus" type="button" data-product-id="<?php echo $product['id']; ?>">+</button>
+                                    </div>
                                     <div class="btn-group" role="group">
-                                        <a href="product.php?id=<?php echo $product['id']; ?>" class="btn btn-outline-primary btn-sm">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="cart/add_to_cart.php?product_id=<?php echo $product['id']; ?>&quantity=1" 
-                                           class="btn btn-primary btn-sm">
+                                        <button type="button" class="btn btn-primary btn-sm add-to-cart-btn" data-product-id="<?php echo $product['id']; ?>">
                                             <i class="bi bi-cart-plus"></i>
-                                        </a>
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-sm buy-now-btn" data-product-id="<?php echo $product['id']; ?>">
+                                            <i class="bi bi-lightning-charge"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -154,5 +159,179 @@ include 'includes/header.php';
         </div>
     </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quantity adjustment for product cards
+    document.querySelectorAll('.quantity-minus').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const quantityInput = document.querySelector(`.product-quantity-input[data-product-id="${productId}"]`);
+            if (quantityInput && parseInt(quantityInput.value) > 1) {
+                quantityInput.value = parseInt(quantityInput.value) - 1;
+            }
+        });
+    });
+
+    document.querySelectorAll('.quantity-plus').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const quantityInput = document.querySelector(`.product-quantity-input[data-product-id="${productId}"]`);
+            if (quantityInput) {
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+            }
+        });
+    });
+
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    const cartBadge = document.querySelector('#main-nav .badge');
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const productId = this.dataset.productId;
+            const quantityInput = document.querySelector(`.product-quantity-input[data-product-id="${productId}"]`);
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1; // Read quantity from input
+            const submitBtn = this;
+            const originalIcon = submitBtn.innerHTML;
+            
+            // Show loading state
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            submitBtn.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('quantity', quantity);
+
+            fetch('cart/add_to_cart.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', data.message);
+                    if (cartBadge) {
+                        cartBadge.textContent = data.cart_count;
+                    }
+                    const productQuantityBadge = document.getElementById(`product-quantity-${productId}`);
+                    if (productQuantityBadge) {
+                        productQuantityBadge.textContent = data.product_quantity;
+                        productQuantityBadge.style.display = data.product_quantity > 0 ? 'inline-block' : 'none';
+                    }
+                    const productQuantityBadge = document.getElementById(`product-quantity-${productId}`);
+                    if (productQuantityBadge) {
+                        productQuantityBadge.textContent = data.product_quantity;
+                        productQuantityBadge.style.display = data.product_quantity > 0 ? 'inline-block' : 'none';
+                    }
+                } else {
+                    showAlert('danger', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', '<?php echo __('error_adding_to_cart'); ?>');
+            })
+            .finally(() => {
+                // Reset button state
+                submitBtn.innerHTML = originalIcon;
+                submitBtn.disabled = false;
+            });
+        });
+    });
+
+    // Buy Now button functionality for product list
+    const buyNowButtons = document.querySelectorAll('.buy-now-btn');
+    buyNowButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const productId = this.dataset.productId;
+            const quantityInput = document.querySelector(`.product-quantity-input[data-product-id="${productId}"]`);
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1; // Read quantity from input
+            
+            const submitBtn = this;
+            const originalIcon = submitBtn.innerHTML;
+            
+            // Show loading state
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            submitBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('quantity', quantity);
+
+            fetch('cart/buy_now_handler.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reset button state before redirection
+                    submitBtn.innerHTML = originalIcon;
+                    submitBtn.disabled = false;
+                    // Redirect to checkout page
+                    window.location.href = 'cart/checkout.php';
+                } else {
+                    showAlert('danger', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', '<?php echo __('error_processing_request'); ?>');
+            })
+            .finally(() => {
+                // Reset button state if redirection doesn't happen immediately
+                submitBtn.innerHTML = originalIcon;
+                submitBtn.disabled = false;
+            });
+        });
+    });
+
+    function showAlert(type, message) {
+        const alertContainer = document.getElementById('flash-messages') || document.querySelector('main .container');
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        if (alertContainer) {
+            alertContainer.prepend(alertDiv);
+        } else {
+            document.body.prepend(alertDiv);
+        }
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Fetch initial cart quantities and update badges on page load
+    fetch('cart/get_cart_quantities.php')
+        .then(response => response.json())
+        .then(cartQuantities => {
+            for (const productId in cartQuantities) {
+                if (cartQuantities.hasOwnProperty(productId)) {
+                    const quantity = cartQuantities[productId];
+                    const productQuantityBadge = document.getElementById(`product-quantity-${productId}`);
+                    if (productQuantityBadge) {
+                        productQuantityBadge.textContent = quantity;
+                        productQuantityBadge.style.display = quantity > 0 ? 'inline-block' : 'none';
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching initial cart quantities:', error);
+        });
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>

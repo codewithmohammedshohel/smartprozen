@@ -1,65 +1,106 @@
-</div>
-</main>
-<footer class="bg-dark text-white py-5 mt-auto">
+<!-- Detailed Footer -->
+<footer class="footer-detailed bg-dark text-white py-5 mt-auto">
     <div class="container">
-        <div class="row">
-            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
-                <?php 
-                $business_name_setting = get_setting('business_name', $conn);
-                $business_name_display = get_translated_text($business_name_setting, 'business_name') ?? 'SmartProZen';
-                ?>
-                <p class="mb-0">&copy; <?php echo date("Y"); ?> <?php echo htmlspecialchars($business_name_display); ?>. All Rights Reserved.</p>
-                <?php 
-                $footer_text_setting = get_setting('footer_text', $conn);
-                $footer_text_display = get_translated_text($footer_text_setting, 'footer_text');
-                if ($footer_text_display): ?>
-                    <p class="small mt-2"><?php echo nl2br(htmlspecialchars($footer_text_display)); ?></p>
-                <?php endif; ?>
-            </div>
-            <div class="col-md-4 text-center mb-3 mb-md-0">
-                <h5 class="text-white mb-3">Quick Links</h5>
+        <div class="row g-4">
+            <!-- Column 1: Shop -->
+            <div class="col-md-6 col-lg-3">
+                <h5 class="fw-bold mb-3">Shop</h5>
                 <ul class="list-unstyled">
-                    <li><a href="<?php echo SITE_URL; ?>/page.php?slug=about-us" class="text-white text-decoration-none">About Us</a></li>
-                    <li><a href="<?php echo SITE_URL; ?>/contact.php" class="text-white text-decoration-none">Contact Us</a></li>
-                    <li><a href="<?php echo SITE_URL; ?>/page.php?slug=privacy-policy" class="text-white text-decoration-none">Privacy Policy</a></li>
-                    <li><a href="<?php echo SITE_URL; ?>/page.php?slug=terms-conditions" class="text-white text-decoration-none">Terms & Conditions</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">All Products</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Smart Home</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Audio</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Accessories</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Gift Cards</a></li>
                 </ul>
             </div>
-            <div class="col-md-4 text-center text-md-end">
-                <h5 class="text-white mb-3">Follow Us</h5>
-                <div class="social-icons">
-                    <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-4"></i></a>
-                    <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-4"></i></a>
-                    <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-4"></i></a>
-                    <a href="#" class="text-white"><i class="bi bi-linkedin fs-4"></i></a>
-                </div>
-                <?php 
-                $business_address_setting = get_setting('business_address', $conn);
-                $business_address_display = get_translated_text($business_address_setting, 'business_address');
-                if ($business_address_display): ?>
-                    <p class="small mt-3 mb-0">Address: <?php echo nl2br(htmlspecialchars($business_address_display)); ?></p>
-                <?php endif; ?>
+
+            <!-- Column 2: Customer Service -->
+            <div class="col-md-6 col-lg-3">
+                <h5 class="fw-bold mb-3">Customer Service</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/smartprozen/contact.php" class="text-white text-decoration-none footer-link">Contact Us</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">FAQ</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Shipping Policy</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Return Policy</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Track Your Order</a></li>
+                </ul>
             </div>
+
+            <!-- Column 3: About SmartProZen -->
+            <div class="col-md-6 col-lg-3">
+                <h5 class="fw-bold mb-3">About SmartProZen</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Our Story</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Blog</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Careers</a></li>
+                    <li class="mb-2"><a href="#" class="text-white text-decoration-none footer-link">Press</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 4: Stay Connected -->
+            <div class="col-md-6 col-lg-3">
+                <h5 class="fw-bold mb-3">Stay Connected</h5>
+                <div class="social-icons d-flex gap-3 mb-4">
+                    <a href="#" class="social-icon fs-4 text-white"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="social-icon fs-4 text-white"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="social-icon fs-4 text-white"><i class="bi bi-tiktok"></i></a>
+                    <a href="#" class="social-icon fs-4 text-white"><i class="bi bi-twitter-x"></i></a>
+                </div>
+                <h5 class="fw-bold mb-3">Accepted Payments</h5>
+                <div class="payment-icons d-flex gap-2">
+                    <i class="bi bi-credit-card-2-front fs-2"></i>
+                    <!-- Placeholder for actual icons -->
+                    <img src="https://placehold.co/40x25/white/black?text=VISA" alt="Visa">
+                    <img src="https://placehold.co/40x25/white/black?text=MC" alt="Mastercard">
+                    <img src="https://placehold.co/40x25/white/black?text=PayPal" alt="PayPal">
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="text-center text-muted">
+            <p>&copy; <?php echo date("Y"); ?> SmartProZen. All Rights Reserved.</p>
         </div>
     </div>
 </footer>
 
 <?php
-// Include the floating WhatsApp icon
-require_once 'whatsapp_icon.php';
+// Include the floating WhatsApp icon if enabled
+if (get_setting('whatsapp_number', $conn)) {
+    require_once 'whatsapp_icon.php';
+}
 ?>
 
-<!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<!-- Essential JavaScript Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
 
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<!-- Custom & Performance Scripts -->
 <script>
-    // Initialize the animation library
-    AOS.init({
-        duration: 800, // values from 0 to 3000, with step 50ms
-        once: true,     // whether animation should happen only once - while scrolling down
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50,
+            });
+        }
     });
 </script>
 
+<!-- PWA Service Worker Registration -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/smartprozen/sw.js').catch(err => {
+                console.error('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+</script>
+
+<?php require_once __DIR__ . '/whatsapp_icon.php'; ?>
+<?php require_once __DIR__ . '/admin_bar.php'; ?>
 </body>
 </html>

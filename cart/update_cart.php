@@ -104,7 +104,11 @@ if (!empty($_SESSION['cart'])) {
 }
 
 $response['cart_total'] = $cart_total;
-$response['cart_count'] = count($_SESSION['cart']);
+$total_items_in_cart = 0;
+foreach ($_SESSION['cart'] as $qty) {
+    $total_items_in_cart += $qty;
+}
+$response['cart_count'] = $total_items_in_cart;
 
 echo json_encode($response);
 exit;

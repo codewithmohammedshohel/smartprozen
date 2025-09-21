@@ -2,10 +2,10 @@
 // Decode the JSON content string from the database
 $content = json_decode($section['content'] ?? '{}', true) ?: [];
 
-// Get the translated text using our helper function
-$title = get_translated_text($content, 'title') ?: 'Welcome';
-$subtitle = get_translated_text($content, 'subtitle') ?: 'Your ultimate online shopping destination';
-$button_text = get_translated_text($content, 'button_text') ?: 'Get Started';
+// Access the content, providing default values if not set
+$title = $content['title'] ?? 'Welcome';
+$subtitle = $content['subtitle'] ?? 'Your ultimate online shopping destination';
+$button_text = $content['button_text'] ?? 'Get Started';
 $button_link = $content['button_link'] ?? '#';
 
 // Get media files
@@ -36,10 +36,14 @@ if (!empty($video_url)) {
         <div class="hero-overlay"></div>
     </div>
     <div class="hero-content container">
-        <h1><?php echo htmlspecialchars($title); ?></h1>
-        <p><?php echo htmlspecialchars($subtitle); ?></p>
+        <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100"><?php echo htmlspecialchars($title); ?></h1>
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200"><?php echo htmlspecialchars($subtitle); ?></p>
         <?php if (!empty($button_text)): ?>
-            <a href="<?php echo htmlspecialchars($button_link); ?>" class="btn btn-hero"><?php echo htmlspecialchars($button_text); ?></a>
+            <a href="<?php echo htmlspecialchars($button_link); ?>" class="btn btn-hero" data-aos="fade-up" data-aos-delay="300"><?php echo htmlspecialchars($button_text); ?></a>
         <?php endif; ?>
+    </div>
+    <!-- Placeholder for product mockups - User should update this with actual images via admin panel -->
+    <div class="hero-mockups d-none d-lg-block">
+        <img src="<?php echo SITE_URL; ?>/uploads/media/default.png" alt="Product Mockup" class="img-fluid">
     </div>
 </section>

@@ -1,1 +1,562 @@
-#wrapper{display:flex}#sidebar-wrapper{min-height:100vh}#sidebar-wrapper .sidebar-heading{padding:.875rem 1.25rem;font-size:1.2rem}#sidebar-wrapper .list-group{width:15rem}#page-content-wrapper{min-width:100vw}#wrapper.toggled #sidebar-wrapper{margin-left:0}#menu-toggle{cursor:pointer}.list-group-item-action{background-color:#343a40;color:#fff}.list-group-item-action:hover,.list-group-item-action:focus{background-color:#495057;color:#fff}.list-group-item-action.active{background-color:#0d6efd;color:#fff;border-color:#0d6efd}@media (min-width:768px){#sidebar-wrapper{margin-left:0}#page-content-wrapper{min-width:0;width:100%}#wrapper.toggled #sidebar-wrapper{margin-left:-15rem}}
+/* Admin Theme Overhaul */
+
+/* General Body Styles */
+body.admin-theme {
+    background-color: #f8f9fa; /* Soft Gray */
+    color: #212529;
+}
+
+/* Sidebar Styles */
+#sidebar-wrapper {
+    width: 280px;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #1a2b47, #121e31); /* Deep Navy Gradient */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    color: #fff;
+}
+
+#sidebar-wrapper .sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar-wrapper .sidebar-header .fs-4 {
+    font-weight: 600;
+}
+
+#sidebar-wrapper .nav-link {
+    font-size: 0.95rem;
+    padding: 0.6rem 1.5rem; /* Reduced vertical padding */
+    color: #fff;
+    border-left: 4px solid transparent;
+    transition: background-color 0.2s ease, border-left-color 0.2s ease;
+}
+
+#sidebar-wrapper .nav-link:hover {
+    background-color: rgba(0, 180, 216, 0.1); /* Vibrant Teal transparent */
+    border-left-color: #00b4d8;
+}
+
+#sidebar-wrapper .nav-link.active {
+    background-color: rgba(0, 180, 216, 0.2); /* Vibrant Teal transparent */
+    border-left-color: #00b4d8; /* Vibrant Teal */
+    font-weight: 600;
+}
+
+.nav-heading {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 0.5rem 1.5rem;
+}
+
+#sidebar-wrapper .dropdown-menu {
+    background-color: #121e31;
+}
+
+#sidebar-wrapper .dropdown-item {
+    color: #fff;
+}
+
+#sidebar-wrapper .dropdown-item:hover {
+    background-color: rgba(0, 180, 216, 0.1);
+}
+
+/* Content Area Styles */
+.admin-theme .card {
+    background-color: #fff;
+    border: none;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+.admin-theme .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
+}
+
+.admin-theme .table {
+    color: #212529;
+}
+
+.admin-theme .breadcrumb-item.active {
+    color: #6c757d;
+}
+
+.admin-theme .list-group-item {
+    background-color: #fff;
+    border-color: #e9ecef;
+}
+
+/* Media Library Enhancements */
+.media-library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.upload-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.upload-card h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.upload-drop-zone {
+    border: 2px dashed #e9ecef;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.upload-drop-zone:hover {
+    background-color: #f8f9fa;
+}
+
+.upload-drop-zone .bi {
+    font-size: 3rem;
+    color: #adb5bd;
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.media-item-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.media-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.media-item-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.media-item-card .card-body {
+    padding: 1rem;
+}
+
+.media-item-card .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.media-item-card .media-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card .card-body {
+    padding: 1.25rem; /* Reduced padding */
+    position: relative;
+    z-index: 1;
+}
+
+.metric-card .metric-value {
+    font-size: 2rem; /* Reduced font size */
+    font-weight: 700;
+}
+
+.metric-card .metric-label {
+    font-size: 0.85rem; /* Reduced font size */
+    opacity: 0.9;
+}
+
+.metric-card .card-icon {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem; /* Reduced icon size */
+    opacity: 0.15;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.metric-card:hover .card-icon {
+    opacity: 0.2;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Card Color Variants */
+.metric-card.card-revenue {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border-color: #0056b3;
+}
+
+.metric-card.card-customers {
+    background: linear-gradient(45deg, #17a2b8, #117a8b);
+    border-color: #117a8b;
+}
+
+.metric-card.card-users {
+    background: linear-gradient(45deg, #ffc107, #d39e00);
+    border-color: #d39e00;
+}
+
+.metric-card.card-orders {
+    background: linear-gradient(45deg, #28a745, #1e7e34);
+    border-color: #1e7e34;
+}
+
+.metric-card.card-pending {
+    background: linear-gradient(45deg, #dc3545, #b02a37);
+    border-color: #b02a37;
+}
+
+.metric-card.card-products {
+    background: linear-gradient(45deg, #6c757d, #545b62);
+    border-color: #545b62;
+}
+
+.metric-card.card-reviews {
+    background: linear-gradient(45deg, #343a40, #23272b);
+    border-color: #23272b;
+}
+
+.metric-card.card-new-customers {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border-color: #0056b3;
+}
+
+/* Frontend In-place Editing Styles */
+.editable-section {
+    position: relative;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.editable-section:hover {
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.5); /* Bootstrap primary color focus ring */
+    border-radius: 4px;
+}
+
+.edit-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 999;
+    opacity: 0.3;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.editable-section:hover .edit-btn {
+    opacity: 1;
+}
+
+/* Gateway Management UI */
+.gateway-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.gateway-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gateway-card .card-title {
+    margin-bottom: 0;
+    font-size: 1.2rem;
+}
+
+.gateway-card .card-body fieldset {
+    border: 1px solid #e9ecef;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.gateway-card .card-body legend {
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0 0.5rem;
+    width: auto;
+}
+
+.gateway-card .form-group {
+    margin-bottom: 1rem;
+}
+
+.gateway-card .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.gateway-card .card-footer {
+    background-color: #f8f9fa;
+}
+
+/* Basic Toggle Switch if not already defined */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 28px;
+}
+
+.toggle-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .slider {
+    background-color: #28a745; /* Green for active */
+}
+
+.toggle-switch input:focus + .slider {
+    box-shadow: 0 0 1px #28a745;
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(22px);
+}
+/* Page Builder UI Enhancements */
+.page-builder-header .card-body .form-inline {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.section-item .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa; /* Light gray background for section headers */
+}
+
+.section-item .card-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.section-actions .btn {
+    margin-left: 0.5rem;
+}
+
+.section-item .card-body .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -5px;
+    margin-left: -5px;
+}
+
+.section-item .card-body .form-group {
+    margin-bottom: 1rem;
+}
+
+.section-item .card-body .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.btn-success {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Enhanced Gateway Management UI Styling */
+.gateway-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.gateway-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.gateway-card .card-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.gateway-card .card-body {
+    padding: 1.25rem;
+}
+
+.gateway-card .card-body label {
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.gateway-card .card-body .form-control {
+    border-radius: 0.3rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.gateway-card .card-body .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.gateway-card .card-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Refined Toggle Switch */
+.toggle-switch .slider {
+    background-color: #adb5bd; /* Gray for off state */
+}
+
+.toggle-switch input:checked + .slider {
+    background-color: #28a745; /* Green for on state */
+}
+
+.toggle-switch .slider:before {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+/* General Button Refinements for consistency */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Layout Enhancements */
+.dashboard-content {
+    padding: 1.5rem; /* Add consistent padding to the main content area */
+}
+
+@media (max-width: 768px) {
+    .gateway-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Adjust columns for smaller screens */
+    }
+}
+
+@media (max-width: 576px) {
+    .gateway-grid {
+        grid-template-columns: 1fr; /* Single column on very small screens */
+    }
+    .gateway-card .card-header,
+    .gateway-card .card-body,
+    .gateway-card .card-footer {
+        padding: 1rem; /* Slightly less padding on small screens */
+    }
+}

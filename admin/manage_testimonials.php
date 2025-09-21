@@ -13,7 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['author_name'])) {
     $author_name = $_POST['author_name'] ?? '';
     $author_title = $_POST['author_title'] ?? '';
     $testimonial_text = $_POST['testimonial_text'] ?? '';
-    $rating = $_POST['rating'] ?? null;
+    $rating = $_POST['rating'] ?? '';
+    $rating = filter_var($rating, FILTER_VALIDATE_INT, array("options" => array("min_range"=>1, "max_range"=>5)));
+    if ($rating === false) {
+        $rating = 1;
+    }
     $is_approved = isset($_POST['is_approved']) ? 1 : 0;
     $testimonial_id = $_POST['testimonial_id'] ?? null;
 

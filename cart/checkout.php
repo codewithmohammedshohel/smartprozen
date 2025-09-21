@@ -1,10 +1,10 @@
 <?php
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../core/db.php';
+require_once __DIR__ . '/../core/functions.php';
 require_once __DIR__ . '/../includes/header.php';
 
-if (!is_logged_in()) {
-    header('Location: /smartprozen/auth/login.php?redirect_to=/cart/checkout.php');
-    exit;
-}
+
 
 if (empty($_SESSION['cart'])) {
     header('Location: /smartprozen/cart/');
@@ -28,7 +28,11 @@ while ($product = $result->fetch_assoc()) {
 $discount = $_SESSION['discount_amount'] ?? 0;
 $total = $subtotal - $discount;
 
-$user = get_user_by_id($_SESSION['user_id'], $conn);
+if (is_logged_in()) {
+    $user = get_user_by_id($_SESSION['user_id'], $conn);
+} else {
+    $user = null;
+}
 
 ?>
 <div class="container py-5">
@@ -41,15 +45,23 @@ $user = get_user_by_id($_SESSION['user_id'], $conn);
                     <form id="checkout-form">
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
+                            <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="address" class="form-label">Address</label>
                             <input type="text" class="form-control" id="address" name="address" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="contact_number" class="form-label">Contact Number</label>
+                            <input type="text" class="form-control" id="contact_number" name="contact_number" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="whatsapp_number" class="form-label">WhatsApp Number (Optional)</label>
+                            <input type="text" class="form-control" id="whatsapp_number" name="whatsapp_number">
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -138,8 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
-                    window.location.href = `/smartprozen/order_confirmation.php?id=${data.order_id}`;
+                    window.location.href = '/smartprozen/user/downloads.php';
                 } else {
                     alert('Error placing order: ' + data.message);
                 }

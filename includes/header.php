@@ -3,194 +3,202 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../core/db.php';
 require_once __DIR__ . '/../core/functions.php';
 
-// Language setting
-$lang_code = $_SESSION['lang'] ?? DEFAULT_LANG; // Default to English
+// Get theme settings
+$settings = get_all_settings($conn);
 
-// Ensure $lang_code is a string, not an array
-if (is_array($lang_code)) {
-    $lang_code = DEFAULT_LANG;
-}
-
-// Additional safety check - ensure it's a valid language code
-if (!in_array($lang_code, ['en', 'bn'])) {
-    $lang_code = DEFAULT_LANG;
-}
-
-// Check if language is set in URL and update session
-if (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'bn'])) {
-    $lang_code = $_GET['lang'];
-    $_SESSION['lang'] = $lang_code;
-}
-
-load_language($lang_code);
-
-// Theme/Skin settings
-$theme_class = get_setting('theme_skin', $conn) ?? 'default'; // e.g., 'default', 'dark', 'corporate'
-$theme_stylesheet = "/smartprozen/css/{$theme_class}.css";
+// Theme customization
+$theme_primary_color = $settings['theme_primary_color'] ?? '#007bff';
+$theme_body_bg = $settings['theme_body_bg'] ?? '#ffffff';
+$theme_text_color = $settings['theme_text_color'] ?? '#212529';
+$theme_font_family = $settings['theme_font_family'] ?? 'Poppins';
+$theme_button_radius = $settings['theme_button_radius'] ?? '4px';
+$theme_card_radius = $settings['theme_card_radius'] ?? '8px';
+$theme_shadow = $settings['theme_shadow'] ?? '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
 
 // Google Fonts
-$google_font = get_setting('google_font', $conn);
-
-// Custom CSS
-$custom_css = get_setting('custom_css', $conn);
+$google_font = $settings['google_font'] ?? 'Poppins';
 
 // SEO Variables
-// Ensure $page_title is always a string or a JSON string for translation
-$page_title_for_translation = '';
-if (isset($page_title)) {
-    if (is_array($page_title)) {
-        $page_title_for_translation = json_encode($page_title);
-    } elseif (is_string($page_title)) {
-        $page_title_for_translation = $page_title;
-    }
-}
+$page_title_for_translation = $page_title ?? $settings['site_name'] ?? 'SmartProZen';
+$page_description_display = $page_description ?? $settings['site_description'] ?? 'Your ultimate online shopping destination.';
 
-// If $page_title_for_translation is still empty, try to get business_name from settings
-if (empty($page_title_for_translation)) {
-    $page_title_for_translation = get_setting('business_name', $conn);
-}
-
-$final_page_title_display = get_translated_text($page_title_for_translation, 'business_name') ?? 'SmartProZen';
-$site_description_setting = get_setting('site_description', $conn);
-$page_description_display = get_translated_text($site_description_setting, 'site_description') ?? 'Your ultimate online shopping destination.';
-
-// Ensure we have strings, not arrays
-if (is_array($final_page_title_display)) {
-    $final_page_title_display = 'SmartProZen';
-}
-if (is_array($page_description_display)) {
-    $page_description_display = 'Your ultimate online shopping destination.';
-}
+// Site information
+$site_name = $settings['site_name'] ?? 'SmartProZen';
+$business_name = $settings['business_name'] ?? 'SmartProZen';
+$logo_filename = $settings['logo_filename'] ?? '';
+$favicon_filename = $settings['favicon_filename'] ?? '';
 
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $lang_code; ?>">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($final_page_title_display); ?></title>
+    <!-- Responsive Meta Tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title><?php echo htmlspecialchars($page_title_for_translation); ?></title>
     <meta name="description" content="<?php echo htmlspecialchars($page_description_display); ?>">
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    
-        <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Favicon -->
+    <?php if ($favicon_filename && file_exists(__DIR__ . '/../uploads/logos/' . $favicon_filename)): ?>
+        <link rel="icon" type="image/x-icon" href="<?php echo SITE_URL; ?>/uploads/logos/<?php echo htmlspecialchars($favicon_filename); ?>">
+    <?php endif; ?>
 
-    <!-- Enhanced CSS -->
-    <link rel="stylesheet" href="/smartprozen/css/enhanced.css">
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://unpkg.com">
 
-    <!-- Google Font -->
-    <?php if ($google_font): ?>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=<?php echo urlencode($google_font); ?>:wght@400;700&display=swap">
+    <!-- CSS with preload for critical resources -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=<?php echo urlencode($google_font); ?>:wght@300;400;500;600;700&display=swap">
+
+    <!-- Preload critical JS -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" as="script">
+
+    <!-- Theme and Component CSS with media attribute for non-critical styles -->
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/enhanced.css">
+    <link rel="stylesheet" href="<?php echo SITE_URL; ?>/css/modern-components.css" media="print" onload="this.media='all'">
+
+    <!-- Animation Libraries with defer loading -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" media="print" onload="this.media='all'">
+
+    <!-- Dynamic Theme Styles -->
     <style>
-        body, h1, h2, h3, h4, h5, h6, p, a, .btn {
-            font-family: '<?php echo $google_font; ?>', sans-serif;
+        :root {
+            --bs-primary: <?php echo $theme_primary_color; ?>;
+            --bs-body-bg: <?php echo $theme_body_bg; ?>;
+            --bs-body-color: <?php echo $theme_text_color; ?>;
+            --bs-border-radius: <?php echo $theme_button_radius; ?>;
+            --bs-border-radius-lg: <?php echo $theme_card_radius; ?>;
+            --bs-box-shadow: <?php echo $theme_shadow; ?>;
+        }
+        
+        body {
+            font-family: '<?php echo $theme_font_family; ?>', sans-serif;
+            background-color: <?php echo $theme_body_bg; ?>;
+            color: <?php echo $theme_text_color; ?>;
+        }
+        
+        .btn {
+            border-radius: <?php echo $theme_button_radius; ?> !important;
+        }
+        
+        .card {
+            border-radius: <?php echo $theme_card_radius; ?> !important;
+            box-shadow: <?php echo $theme_shadow; ?> !important;
+        }
+        
+        .navbar-brand {
+            font-family: '<?php echo $theme_font_family; ?>', sans-serif;
+        }
+        
+        .btn-primary {
+            background-color: <?php echo $theme_primary_color; ?>;
+            border-color: <?php echo $theme_primary_color; ?>;
+        }
+        
+        .btn-primary:hover {
+            background-color: <?php echo $theme_primary_color; ?>;
+            border-color: <?php echo $theme_primary_color; ?>;
+            opacity: 0.9;
+        }
+        
+        .text-primary {
+            color: <?php echo $theme_primary_color; ?> !important;
+        }
+        
+        .bg-primary {
+            background-color: <?php echo $theme_primary_color; ?> !important;
         }
     </style>
-    <?php endif; ?>
 
-    <!-- Custom CSS -->
-    <?php if ($custom_css): ?>
-    <style>
-        <?php echo $custom_css; ?>
-    </style>
-    <?php endif; ?>
 
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
 </head>
+
 <body class="d-flex flex-column min-vh-100">
-<header class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-    <div class="container">
-        <a class="navbar-brand" href="/smartprozen/">
-            <?php
-            $business_logo_filename = get_setting('business_logo_filename', $conn);
-            $business_name_setting = get_setting('business_name', $conn);
-            $business_name = get_translated_text($business_name_setting, 'business_name') ?? 'SmartProZen';
-            
-            // Ensure business_name is a string
-            if (is_array($business_name)) {
-                $business_name = 'SmartProZen';
-            }
-            if ($business_logo_filename) {
-                echo '<img src="' . SITE_URL . '/uploads/media/' . htmlspecialchars($business_logo_filename) . '" alt="' . htmlspecialchars($business_name) . '" style="max-height: 40px;">';
-            } else {
-                echo '<span>' . htmlspecialchars($business_name) . '</span>'; // Use span for non-h1 branding
-            }
-            ?>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="main-nav">
-            <?php
-            if (function_exists('generate_menu')) {
-                echo generate_menu('main-menu', $conn);
-            }
-            ?>
-            <form class="d-flex ms-auto me-2" action="/smartprozen/products_list.php" method="GET">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search">
-                <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
-            </form>
-            <div class="d-flex align-items-center">
-                <a href="/smartprozen/cart/" class="btn btn-outline-primary position-relative me-2">
-                    <?php echo __('cart'); ?>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        <?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>
-                    </span>
-                </a>
-                    <?php if (isset($_SESSION['user_id'])): ?>
+
+    <header class="navbar navbar-expand-lg shadow-sm sticky-top bg-gradient">
+        <div class="container py-3">
+            <a class="navbar-brand d-flex align-items-center" href="<?php echo SITE_URL; ?>/">
+                <?php if ($logo_filename && file_exists(__DIR__ . '/../uploads/logos/' . $logo_filename)): ?>
+                    <img src="<?php echo SITE_URL; ?>/uploads/logos/<?php echo htmlspecialchars($logo_filename); ?>" 
+                         alt="<?php echo htmlspecialchars($business_name); ?>" height="40" class="me-2">
+                <?php else: ?>
+                    <span class="fw-bold fs-4 me-2"><?php echo htmlspecialchars($business_name); ?></span>
+                <?php endif; ?>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <?php echo generate_menu('main-menu', $conn); ?>
+
+                <div class="d-flex align-items-center ms-lg-3 gap-2">
+                    <?php if (is_user_logged_in()): ?>
                         <div class="dropdown">
-                            <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle me-1"></i>
-                                <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="/smartprozen/user/dashboard.php">
-                                    <i class="bi bi-speedometer2 me-2"></i><?php echo __('dashboard'); ?>
-                                </a></li>
-                                <li><a class="dropdown-item" href="/smartprozen/user/profile.php">
-                                    <i class="bi bi-person me-2"></i><?php echo __('profile'); ?>
-                                </a></li>
-                                <li><a class="dropdown-item" href="/smartprozen/user/orders.php">
-                                    <i class="bi bi-bag me-2"></i><?php echo __('my_orders'); ?>
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="/smartprozen/auth/logout.php">
-                                    <i class="bi bi-box-arrow-right me-2"></i><?php echo __('logout'); ?>
-                                </a></li>
-                            </ul>
-                        </div>
-                    <?php elseif (isset($_SESSION['admin_id'])): ?>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-light dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-shield-check me-1"></i>
-                                <?php echo htmlspecialchars($_SESSION['admin_username'] ?? 'Admin'); ?>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" href="/smartprozen/admin/dashboard.php">
-                                    <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
-                                </a></li>
-                                <li><a class="dropdown-item" href="/smartprozen/admin/settings.php">
-                                    <i class="bi bi-gear me-2"></i>Settings
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="/smartprozen/admin/logout.php">
-                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                </a></li>
+                            <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" id="userDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i> Account
+                            </a>
+                                <ul class="dropdown-menu shadow-medium border-0" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/dashboard.php"><i
+                                            class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/orders.php"><i
+                                            class="bi bi-bag-check me-2"></i>Orders</a></li>
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/profile.php"><i
+                                            class="bi bi-person me-2"></i>Profile</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/auth/logout.php"><i
+                                            class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
                             </ul>
                         </div>
                     <?php else: ?>
-                        <a href="/smartprozen/auth/login.php" class="btn btn-primary me-2"><?php echo __('login'); ?></a>
-                        <a href="/smartprozen/auth/register.php" class="btn btn-outline-light"><?php echo __('register'); ?></a>
+                        <a href="<?php echo SITE_URL; ?>/auth/login.php" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                        </a>
+                        <a href="<?php echo SITE_URL; ?>/auth/register.php" class="btn btn-primary d-none d-lg-inline-flex">
+                            Register
+                        </a>
                     <?php endif; ?>
-                <div class="lang-switcher ms-3">
-                    <a href="?lang=en" class="text-decoration-none <?php echo $lang_code === 'en' ? 'fw-bold' : ''; ?>">EN</a> | 
-                    <a href="?lang=bn" class="text-decoration-none <?php echo $lang_code === 'bn' ? 'fw-bold' : ''; ?>">BN</a>
+
+                    <a href="<?php echo SITE_URL; ?>/cart/" class="btn btn-outline-primary btn-cart position-relative me-2">
+                        <i class="bi bi-cart3"></i>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
+                            <span class="cart-item-count">0</span>
+                        </span>
+                    </a>
+
+
                 </div>
             </div>
         </div>
-    </div>
-</header>
-<main class="flex-grow-1">
-    <div class="container">
+    </header>
+    <script>
+        function changeLanguage(lang) {
+            var iframe = document.getElementsByClassName('goog-te-menu-frame')[0];
+            if (!iframe) return;
+            var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            var langElements = innerDoc.getElementsByClassName('goog-te-menu2-item');
+            for (var i = 0; i < langElements.length; i++) {
+                if (langElements[i].getAttribute('value') == lang) {
+                    langElements[i].click();
+                }
+            }
+        }
+    </script>
+    <main class="flex-grow-1">
+        <div class="container">
+        </div>

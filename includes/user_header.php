@@ -1,16 +1,11 @@
 <?php
-// require_once __DIR__ . '/../config.php'; // config.php now handles session_start()
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../core/db.php';
+require_once __DIR__ . '/../core/functions.php';
 
-// Language setting
-$lang = $_SESSION['lang'] ?? 'bn'; // Default to Bengali
-
-// Check if language is set in URL and update session
-if (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'bn'])) {
-    $lang = $_GET['lang'];
-    $_SESSION['lang'] = $lang;
-}
-
-load_language($lang);
+// Language setting - Hardcoded to English
+$lang_code = 'en';
+load_language($lang_code);
 
 // Theme/Skin settings
 $theme_class = get_setting('theme_skin', $conn) ?? 'default'; // e.g., 'default', 'dark', 'corporate'
@@ -23,12 +18,12 @@ $google_font = get_setting('google_font', $conn);
 $custom_css = get_setting('custom_css', $conn);
 
 // SEO Variables
-$page_title = $page_title ?? (get_setting('business_name', $conn) ?? 'SmartProZen');
-$page_description = $page_description ?? (get_setting('site_description', $conn) ?? 'Your ultimate online shopping destination.');
+$page_title = $page_title ?? get_translated_text(get_setting('business_name', $conn), 'business_name') ?? 'SmartProZen';
+$page_description = $page_description ?? get_translated_text(get_setting('site_description', $conn), 'site_description') ?? 'Your ultimate online shopping destination.';
 
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $lang; ?>">
+<html lang="<?php echo $lang_code; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,10 +64,18 @@ $page_description = $page_description ?? (get_setting('site_description', $conn)
         <a class="navbar-brand" href="/smartprozen/">
             <?php
             $logo_path = get_setting('logo_path', $conn);
+            $business_name_setting = get_setting('business_name', $conn);
+            $business_name = get_translated_text($business_name_setting, 'business_name') ?? 'SmartProZen';
+
+            // Ensure business_name is a string
+            if (is_array($business_name)) {
+                $business_name = 'SmartProZen';
+            }
+
             if ($logo_path) {
-                echo '<img src="/smartprozen/' . htmlspecialchars($logo_path) . '" alt="Logo" style="max-height: 40px;">';
+                echo '<img src="' . SITE_URL . '/' . htmlspecialchars($logo_path) . '" alt="' . htmlspecialchars($business_name) . '" style="max-height: 40px;">';
             } else {
-                echo '<h1>' . htmlspecialchars(get_setting('business_name', $conn) ?? 'SmartProZen') . '</h1>';
+                echo '<h1>' . htmlspecialchars($business_name) . '</h1>';
             }
             ?>
         </a>
@@ -110,10 +113,6 @@ $page_description = $page_description ?? (get_setting('site_description', $conn)
                 <?php else: ?>
                     <a href="/smartprozen/auth/login.php" class="btn btn-primary"><?php echo __('login'); ?></a>
                 <?php endif; ?>
-                <div class="lang-switcher ms-3">
-                    <a href="?lang=en" class="text-decoration-none <?php echo $lang === 'en' ? 'fw-bold' : ''; ?>">EN</a> | 
-                    <a href="?lang=bn" class="text-decoration-none <?php echo $lang === 'bn' ? 'fw-bold' : ''; ?>">BN</a>
-                </div>
             </div>
         </div>
     </div>

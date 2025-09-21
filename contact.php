@@ -67,7 +67,7 @@ include 'includes/header.php';
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="name" class="form-label"><?php echo __('full_name'); ?> <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($name ?? ''); ?>" required>
+                                        <input type="text" class="form-control" id="name" name="name" value="" placeholder="<?php echo htmlspecialchars(__('full_name')); ?>" autocomplete="off" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="email" class="form-label"><?php echo __('email_address'); ?> <span class="text-danger">*</span></label>
@@ -180,21 +180,37 @@ include 'includes/header.php';
 
 <style>
 .contact-icon {
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 123, 255, 0.1);
+    width: 55px;
+    height: 55px;
+    background: rgba(0, 123, 255, 0.15);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info > div {
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.contact-info > div:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .social-links a {
     transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .social-links a:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 </style>
 

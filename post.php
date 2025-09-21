@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'core/functions.php'; // <-- FIX: Add missing include
 require_once __DIR__ . '/includes/header.php';
 
 if (!isset($_GET['slug'])) {

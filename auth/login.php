@@ -58,6 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user_name'] = $user['name'];
                     $_SESSION['user_email'] = $user['email'];
                     
+                    // Log successful login
+                    log_activity('user', $user['id'], 'user_login', "User {$user['email']} logged in successfully.");
+                    
                     // Handle remember me
                     if ($remember_me) {
                         // Set a long-lasting cookie (30 days)

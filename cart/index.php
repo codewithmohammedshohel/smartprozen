@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../core/db.php';
+require_once __DIR__ . '/../core/functions.php';
 require_once __DIR__ . '/../includes/header.php';
 
 $cart_items = [];
@@ -21,7 +24,7 @@ $discount = $_SESSION['discount_amount'] ?? 0;
 $total = $subtotal - $discount;
 
 ?>
-<div class="container py-5">
+<div class="container py-5 cart-page-container">
     <h1 class="mb-4">Your Shopping Cart</h1>
     <div id="flash-messages"></div>
     <div class="row">
@@ -44,19 +47,19 @@ $total = $subtotal - $discount;
                                     <tr><td colspan="5" class="text-center">Your cart is empty.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($cart_items as $item): ?>
-                                        <tr id="cart-item-<?php echo $item['id']; ?>">
+                                        <tr id="cart-item-<?php echo $item['id']; ?>" class="cart-item-row">
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="<?php echo SITE_URL . '/uploads/media/thumb-' . htmlspecialchars($item['image_filename']); ?>" alt="<?php echo htmlspecialchars(get_translated_text($item['name'], 'name')); ?>" class="img-fluid rounded me-3" style="width: 60px;">
-                                                    <div><?php echo htmlspecialchars(get_translated_text($item['name'], 'name')); ?></div>
+                                                    <img src="<?php echo SITE_URL . '/uploads/media/thumb-' . htmlspecialchars($item['image_filename']); ?>" alt="<?php echo htmlspecialchars(get_translated_text($item['name'], 'name')); ?>" class="img-fluid rounded me-3 cart-table-product-img">
+                                                    <div class="cart-table-product-name"><?php echo htmlspecialchars(get_translated_text($item['name'], 'name')); ?></div>
                                                 </div>
                                             </td>
-                                            <td>$<?php echo number_format($item['price'], 2); ?></td>
-                                            <td>
+                                            <td data-label="Price">$<?php echo number_format($item['price'], 2); ?></td>
+                                            <td data-label="Quantity">
                                                 <input type="number" class="form-control form-control-sm quantity-input" data-id="<?php echo $item['id']; ?>" value="<?php echo $item['quantity']; ?>" min="1">
                                             </td>
-                                            <td class="text-end">$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
-                                            <td class="text-center">
+                                            <td data-label="Total" class="text-end">$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
+                                            <td data-label="Remove" class="text-center">
                                                 <button class="btn btn-sm btn-outline-danger remove-item" data-id="<?php echo $item['id']; ?>">&times;</button>
                                             </td>
                                         </tr>
@@ -69,14 +72,14 @@ $total = $subtotal - $discount;
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm cart-summary-card">
                 <div class="card-body">
                     <h2 class="card-title h4">Cart Summary</h2>
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <span>Subtotal</span>
                         <strong id="cart-subtotal">$<?php echo number_format($subtotal, 2); ?></strong>
                     </div>
-                    <form action="apply_coupon.php" method="POST" class="mt-3">
+                    <form action="apply_coupon.php" method="POST" class="mt-3 coupon-form">
                         <div class="input-group">
                             <input type="text" class="form-control" name="coupon_code" placeholder="Coupon Code">
                             <button type="submit" class="btn btn-secondary">Apply</button>
@@ -88,7 +91,7 @@ $total = $subtotal - $discount;
                             <span id="cart-discount">-$<?php echo number_format($discount, 2); ?></span>
                         </div>
                     <?php endif; ?>
-                    <div class="d-flex justify-content-between align-items-center mt-3 h5 border-top pt-2">
+                    <div class="d-flex justify-content-between align-items-center mt-3 h5 border-top pt-2 cart-total-row">
                         <strong>Total</strong>
                         <strong id="cart-total">$<?php echo number_format($total, 2); ?></strong>
                     </div>

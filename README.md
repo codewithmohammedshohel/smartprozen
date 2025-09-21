@@ -1,243 +1,248 @@
-# SmartProZen - Digital Product E-commerce CMS
+# SmartProZen CMS E-commerce Platform
 
-A complete, modern, and feature-rich Content Management System (CMS) designed specifically for selling digital products online. Built with PHP, MySQL, and Bootstrap 5, SmartProZen provides a robust platform for digital product sales with an intuitive admin panel and customer-facing store.
+A comprehensive, fully customizable Content Management System (CMS) and E-commerce platform built with PHP, MySQL, and modern web technologies. Perfect for both physical and digital product sales.
 
-## 🚀 Features
+## 🚀 Key Features
 
-### Core E-commerce Features
-- **Digital Product Management** - Upload, manage, and sell digital products
-- **Shopping Cart & Checkout** - Complete e-commerce functionality
-- **Order Management** - Track and manage customer orders
-- **User Management** - Customer registration, login, and profiles
-- **Payment Integration** - Support for multiple payment gateways
-- **Coupon System** - Create and manage discount coupons
-- **Wishlist** - Allow customers to save favorite products
-- **Download Management** - Secure digital product downloads
-- **Review System** - Customer reviews and ratings
+### 🎨 **100% Customizable Design**
+- **Dynamic Theme System**: Real-time theme customization with color picker, fonts, and styling
+- **Page Builder**: Drag-and-drop page builder with customizable sections
+- **Responsive Templates**: Mobile-first responsive design that works on all devices
+- **Multiple Themes**: Built-in themes (Default, Dark, Modern) with easy switching
+- **Custom CSS**: Advanced CSS customization options
 
-### Content Management
-- **Page Builder** - Drag-and-drop page builder with sections
-- **Blog System** - Complete blogging functionality
-- **Media Library** - Centralized media management
-- **SEO Tools** - Built-in SEO optimization
-- **Multi-language Support** - English and Bengali language support
-- **Template System** - Customizable page templates
+### 🛒 **Complete E-commerce Solution**
+- **Physical & Digital Products**: Support for both product types with automatic delivery
+- **Product Management**: Categories, tags, images, galleries, and SEO optimization
+- **Order Management**: Complete order processing, tracking, and status updates
+- **Payment Gateways**: Stripe, PayPal, and custom payment methods
+- **Shopping Cart**: Advanced cart functionality with AJAX updates
+- **Coupon System**: Discount codes and promotional offers
+- **Wishlist**: Save products for later purchase
+- **Reviews & Ratings**: Customer feedback system
 
-### Admin Features
-- **Dashboard Analytics** - Sales reports and statistics
-- **Role-based Access Control** - Granular permission system
-- **Activity Logging** - Track all system activities
-- **Settings Management** - Comprehensive site configuration
-- **Email Templates** - Customizable email notifications
-- **Backup & Restore** - Database backup functionality
+### 👥 **User Management**
+- **User Registration**: Secure user registration with email verification
+- **Role-Based Access**: Admin, Editor, and Viewer roles with permissions
+- **User Dashboard**: Personal dashboard with orders, downloads, and profile
+- **Guest Checkout**: Allow purchases without registration
+- **Account Management**: Profile editing and password reset
 
-### Technical Features
-- **Responsive Design** - Mobile-first, fully responsive
-- **Modern UI/UX** - Clean, professional interface
-- **Security** - CSRF protection, SQL injection prevention
-- **Performance** - Optimized for speed and efficiency
-- **XAMPP Ready** - Perfect for local development
+### 📊 **Admin Panel**
+- **Dashboard**: Comprehensive analytics and metrics
+- **Product Management**: Add, edit, and manage products with media
+- **Order Management**: Process orders and update statuses
+- **Customer Management**: View and manage customer accounts
+- **Content Management**: Pages, posts, and media library
+- **Settings**: Site configuration, theme settings, and preferences
+- **Reports**: Sales reports and analytics
+- **Activity Logs**: Track all admin and user activities
+
+### 🔧 **Technical Features**
+- **SEO Optimized**: Meta tags, sitemaps, and search engine optimization
+- **Security**: CSRF protection, SQL injection prevention, secure sessions
+- **Performance**: Optimized database queries and caching
+- **Multi-language Ready**: Framework for multiple languages
+- **API Ready**: RESTful API endpoints for integrations
+- **Backup System**: Automated backup functionality
+- **Error Handling**: Comprehensive error logging and handling
 
 ## 📋 Requirements
 
-- **PHP** 7.4 or higher
-- **MySQL** 5.7 or higher
-- **Apache** web server
-- **XAMPP** (recommended for local development)
-- **Web Browser** (Chrome, Firefox, Safari, Edge)
+- **PHP**: 7.4 or higher (8.0+ recommended)
+- **MySQL**: 5.7 or higher (8.0+ recommended)
+- **Web Server**: Apache/Nginx
+- **Extensions**: GD, cURL, JSON, PDO, OpenSSL
+- **Memory**: 128MB+ PHP memory limit
+- **Storage**: 100MB+ for installation and uploads
 
-## 🛠️ Installation
+## 🚀 Quick Installation
 
-### Using XAMPP (Recommended)
+### For XAMPP (Local Development)
 
 1. **Download XAMPP**
-   - Download XAMPP from [https://www.apachefriends.org/](https://www.apachefriends.org/)
-   - Install XAMPP on your system
+   ```bash
+   # Download from https://www.apachefriends.org/
+   # Install and start Apache + MySQL
+   ```
 
 2. **Setup Project**
    ```bash
-   # Navigate to XAMPP htdocs directory
-   cd C:\xampp\htdocs
-   
-   # Clone or extract SmartProZen
-   # Place the smartprozen folder in htdocs
+   # Copy to htdocs folder
+   cp -r smartprozen/ C:/xampp/htdocs/smartprozen/
    ```
 
 3. **Database Setup**
-   - Start XAMPP Control Panel
-   - Start Apache and MySQL services
-   - Open phpMyAdmin (http://localhost/phpmyadmin)
-   - Create a new database named `smartprozen_db`
+   - Open phpMyAdmin: http://localhost/phpmyadmin
+   - Create database: `smartprozen_db`
+   - Import: `smartprozen_db.sql`
 
 4. **Configuration**
+   - System auto-detects XAMPP environment
+   - Default settings work out of the box
+   - Access: http://localhost/smartprozen
+
+5. **Admin Setup**
+   - Run setup: http://localhost/smartprozen/setup.php
+   - Create admin account
+   - Access admin: http://localhost/smartprozen/admin/
+
+### For cPanel (Production Hosting)
+
+1. **Upload Files**
+   - Upload all files to `public_html` folder
+   - Maintain folder structure
+
+2. **Database Setup**
+   - Create MySQL database in cPanel
+   - Create database user with full permissions
+   - Import `smartprozen_db.sql`
+
+3. **Configuration**
    - Copy `config.php.template` to `config.php`
-   - Update database credentials in `config.php`:
-     ```php
-     define('DB_HOST', 'localhost');
-     define('DB_USER', 'root');
-     define('DB_PASS', '');
-     define('DB_NAME', 'smartprozen_db');
-     define('SITE_URL', 'http://localhost/smartprozen');
-     ```
+   - Update database credentials and site URL
+   - Set file permissions: `chmod 755 uploads/ logs/`
 
-5. **Installation Wizard**
-   - Open your browser and go to `http://localhost/smartprozen/setup.php`
-   - Follow the installation wizard
-   - Create your admin account
-   - Complete the setup
+4. **SSL Certificate**
+   - Enable SSL in cPanel
+   - Update SITE_URL to use HTTPS
 
-6. **Access Your Store**
-   - Frontend: `http://localhost/smartprozen/`
-   - Admin Panel: `http://localhost/smartprozen/admin/`
+## 🎨 Customization Guide
+
+### Theme Customization
+1. **Access Theme Settings**: Admin Panel → Settings → Theme Settings
+2. **Color Palette**: Customize primary, secondary, and accent colors
+3. **Typography**: Choose from Google Fonts (Poppins, Roboto, Open Sans, etc.)
+4. **Layout**: Adjust button radius, card radius, and shadows
+5. **Live Preview**: See changes in real-time
+
+### Page Builder
+1. **Create Pages**: Admin Panel → Pages → Add New Page
+2. **Add Sections**: Choose from Hero, Rich Text, Products, FAQ, etc.
+3. **Customize Content**: Edit text, images, and settings for each section
+4. **Drag & Drop**: Reorder sections with drag-and-drop interface
+
+### Product Management
+1. **Add Products**: Admin Panel → Products → Add New Product
+2. **Product Types**: Choose Physical or Digital products
+3. **Media**: Upload main image and gallery images
+4. **SEO**: Set meta title, description, and keywords
+5. **Categories**: Organize products with categories and tags
 
 ## 📁 Project Structure
 
 ```
 smartprozen/
-├── admin/                  # Admin panel files
-│   ├── dashboard.php      # Admin dashboard
+├── admin/                 # Admin panel files
+│   ├── dashboard.php     # Admin dashboard
 │   ├── manage_products.php # Product management
-│   ├── manage_orders.php  # Order management
+│   ├── settings.php      # Site settings
+│   ├── theme_settings.php # Theme customization
 │   └── ...
-├── api/                   # API endpoints
-├── assets/                # Static assets
-├── auth/                  # Authentication files
-├── cart/                  # Shopping cart functionality
-├── core/                  # Core system files
-│   ├── db.php            # Database connection
-│   ├── functions.php     # Core functions
-│   └── media_handler.php # Media handling
-├── css/                   # Stylesheets
-├── includes/              # Common includes
-├── lang/                  # Language files
-├── uploads/               # Uploaded files
-│   ├── media/            # Product images
-│   ├── files/            # Digital products
-│   └── logos/            # Site logos
-├── user/                  # User dashboard
-├── config.php             # Configuration
-├── schema.sql            # Database schema
-└── setup.php             # Installation wizard
+├── auth/                 # Authentication files
+├── cart/                 # Shopping cart functionality
+├── core/                 # Core system files
+│   ├── db.php           # Database connection
+│   ├── functions.php    # Core functions
+│   └── ...
+├── css/                  # Stylesheets
+│   ├── enhanced.css     # Main theme
+│   ├── dark.css         # Dark theme
+│   └── modern-components.css
+├── includes/             # Template includes
+├── templates/            # Page templates
+├── uploads/              # File uploads
+├── config.php            # Configuration
+├── setup.php             # Installation script
+└── sample_data.sql       # Sample data
 ```
-
-## 🎨 Customization
-
-### Themes
-- Edit CSS files in the `css/` directory
-- Modify `enhanced.css` for main styling
-- Use Bootstrap 5 classes for quick styling
-
-### Languages
-- Add new language files in `lang/` directory
-- Follow the JSON format of existing language files
-- Update language switcher in header
-
-### Templates
-- Page templates are in `templates/` directory
-- Section templates in `templates/sections/`
-- Modify or create new templates as needed
 
 ## 🔧 Configuration
 
-### Site Settings
-Access admin panel → Settings to configure:
-- Site name and description
-- Business information
-- Email settings
-- Payment gateways
-- SEO settings
-- Social media links
+### Environment Detection
+The system automatically detects your environment:
+- **Local**: localhost, 127.0.0.1, 192.168.x.x
+- **Production**: Any domain with dots
 
-### Product Management
-- Add products with images and digital files
-- Set categories and tags
-- Configure pricing and discounts
-- Manage inventory
+### Database Configuration
+```php
+// Local (XAMPP)
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'smartprozen_db');
 
-### User Management
-- Create user accounts
-- Set up roles and permissions
-- Manage customer data
+// Production (cPanel)
+define('DB_HOST', 'localhost');
+define('DB_USER', 'your_cpanel_user');
+define('DB_PASS', 'your_cpanel_password');
+define('DB_NAME', 'your_cpanel_db');
+```
 
-## 🚀 Deployment
+### Email Configuration
+```php
+define('SMTP_HOST', 'smtp.gmail.com');
+define('SMTP_USER', 'your-email@gmail.com');
+define('SMTP_PASS', 'your-app-password');
+define('SMTP_PORT', 587);
+```
 
-### Production Setup
+## 📊 Sample Data
 
-1. **Server Requirements**
-   - PHP 7.4+ with MySQLi extension
-   - MySQL 5.7+
-   - Apache/Nginx web server
-   - SSL certificate (recommended)
+The system includes comprehensive sample data:
+- **10 Sample Products**: Mix of physical and digital products
+- **6 Product Categories**: Organized product categories
+- **5 Sample Pages**: Home, About, Services, Contact, etc.
+- **5 Testimonials**: Customer testimonials
+- **5 Blog Posts**: Sample blog content
+- **4 Coupons**: Discount codes
+- **Sample Menus**: Navigation menus
+- **Sample Reviews**: Product reviews and ratings
 
-2. **File Upload**
-   - Upload all files to your web server
-   - Set proper file permissions (755 for directories, 644 for files)
-   - Ensure `uploads/` directory is writable
+## 🛡️ Security Features
 
-3. **Database Setup**
-   - Create database on your server
-   - Import `schema.sql` file
-   - Update `config.php` with production credentials
+- **CSRF Protection**: All forms protected against CSRF attacks
+- **SQL Injection Prevention**: Prepared statements throughout
+- **XSS Protection**: Input sanitization and output escaping
+- **Secure Sessions**: Session security configuration
+- **File Upload Security**: Type and size validation
+- **Password Hashing**: bcrypt password hashing
+- **Access Control**: Role-based permissions
 
-4. **Security**
-   - Change default admin password
-   - Enable HTTPS
-   - Set up regular backups
-   - Update PHP and MySQL to latest versions
+## 🚀 Performance Optimization
 
-## 📱 Mobile Responsiveness
+- **Database Optimization**: Indexed queries and optimized structure
+- **Image Optimization**: Automatic image resizing and compression
+- **Caching**: Built-in caching system
+- **CDN Ready**: Compatible with CDN services
+- **Minified Assets**: Optimized CSS and JavaScript
+- **Lazy Loading**: Images and content lazy loading
 
-SmartProZen is fully responsive and works perfectly on:
-- Desktop computers
-- Tablets
-- Mobile phones
-- All modern browsers
+## 📱 Mobile Responsive
 
-## 🔒 Security Features
+- **Mobile-First Design**: Optimized for mobile devices
+- **Touch-Friendly**: Touch-optimized interface
+- **Responsive Images**: Adaptive image sizing
+- **Mobile Navigation**: Collapsible mobile menu
+- **Fast Loading**: Optimized for mobile networks
 
-- **SQL Injection Prevention** - Prepared statements
-- **XSS Protection** - Input sanitization
-- **CSRF Protection** - Token-based protection
-- **Password Hashing** - Secure password storage
-- **Session Management** - Secure session handling
-- **File Upload Security** - Type and size validation
+## 🔌 API Integration
 
-## 🛠️ Development
+- **RESTful API**: Built-in API endpoints
+- **Payment Gateways**: Stripe, PayPal integration
+- **Email Services**: SMTP configuration
+- **Social Media**: Social sharing integration
+- **Analytics**: Google Analytics integration
 
-### Adding New Features
+## 📈 Analytics & Reporting
 
-1. **Database Changes**
-   - Update `schema.sql` with new tables/fields
-   - Create migration scripts if needed
+- **Sales Analytics**: Revenue and order tracking
+- **Customer Insights**: User behavior analysis
+- **Product Performance**: Best-selling products
+- **Traffic Analysis**: Page views and user flow
+- **Conversion Tracking**: Order conversion rates
 
-2. **Backend Development**
-   - Add new PHP files in appropriate directories
-   - Follow existing code structure and naming conventions
-   - Use prepared statements for database queries
-
-3. **Frontend Development**
-   - Use Bootstrap 5 classes
-   - Follow responsive design principles
-   - Test on multiple devices
-
-### Code Standards
-
-- Use meaningful variable and function names
-- Comment complex code sections
-- Follow PSR-12 coding standards
-- Validate all user inputs
-- Use prepared statements for database queries
-
-## 📊 Analytics & Reporting
-
-The admin dashboard provides:
-- Sales analytics
-- Order statistics
-- User activity logs
-- Product performance metrics
-- Revenue reports
-
-## 🆘 Support
+## 🆘 Support & Troubleshooting
 
 ### Common Issues
 
@@ -247,36 +252,60 @@ The admin dashboard provides:
    - Verify database exists
 
 2. **File Upload Issues**
-   - Check `uploads/` directory permissions
-   - Verify PHP upload settings
-   - Check file size limits
+   - Check file permissions: `chmod 755 uploads/`
+   - Verify upload directory exists
+   - Check PHP upload limits
 
-3. **Page Not Found Errors**
-   - Check Apache mod_rewrite is enabled
-   - Verify .htaccess file exists
-   - Check file permissions
+3. **Theme Not Loading**
+   - Clear browser cache
+   - Check CSS file permissions
+   - Verify theme settings in admin
+
+4. **Admin Login Issues**
+   - Reset admin password via database
+   - Check session configuration
+   - Clear browser cache
 
 ### Getting Help
+- Check error logs in `logs/` folder
+- Review this documentation
+- Test in local environment first
+- Check PHP and MySQL versions
 
-- Check the documentation
-- Review error logs in `logs/` directory
-- Test with default settings first
-- Ensure all requirements are met
+## 🔄 Updates & Maintenance
+
+### Regular Maintenance
+- **Database Backups**: Automated daily backups
+- **Security Updates**: Regular security patches
+- **Performance Monitoring**: Track site performance
+- **Content Updates**: Regular content refresh
+
+### Updates
+- **Backup First**: Always backup before updating
+- **Test Locally**: Test updates in local environment
+- **Check Compatibility**: Verify PHP/MySQL compatibility
+- **Update Dependencies**: Keep libraries updated
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+This project is open source. Please check the license file for details.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please follow these guidelines:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## 📞 Contact
 
-For support or questions:
-- Email: support@smartprozen.com
-- Website: https://smartprozen.com
+For support, questions, or custom development:
+- **Email**: support@smartprozen.com
+- **Website**: https://smartprozen.com
+- **Documentation**: Check this README and DEPLOYMENT_GUIDE.md
 
 ---
 
-**SmartProZen** - Your complete digital product e-commerce solution! 🚀
+**SmartProZen** - Your complete solution for digital commerce and content management. Built with modern technologies and designed for scalability, security, and ease of use.

@@ -14,12 +14,33 @@
     <!-- Admin CSS -->
     <link rel="stylesheet" href="/smartprozen/css/admin.css">
 
-    <script src="https://cdn.tiny.cloud/1/YOUR_API_KEY/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
-        tinymce.init({
-            selector: '.tinymce'
-        });
-    </script>
+
 </head>
-<body>
-<div class="d-flex" id="wrapper">
+<body class="admin-theme">
+    <?php
+    if (isset($_GET['action']) && $_GET['action'] === 'clear_cache') {
+        if (clear_pwa_cache()) {
+            $_SESSION['success_message'] = "PWA cache has been cleared. Users will receive the latest updates.";
+        } else {
+            $_SESSION['error_message'] = "Failed to clear PWA cache.";
+        }
+        header('Location: ' . strtok($_SERVER["REQUEST_URI"], '?'));
+        exit;
+    }
+    ?>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Admin Panel</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="?action=clear_cache">
+                            <i class="bi bi-arrow-clockwise"></i> Clear Cache
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="d-flex" id="wrapper">
+    <?php require_once 'admin_sidebar.php'; ?>

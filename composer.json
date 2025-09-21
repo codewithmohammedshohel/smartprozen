@@ -1,0 +1,7 @@
+{
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.29",
+        "setasign/fpdf": "^1.8",
+        "pragmarx/google2fa": "^8.0"
+    }
+}

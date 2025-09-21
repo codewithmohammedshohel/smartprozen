@@ -260,25 +260,51 @@ function is_module_enabled($slug, $conn) {
 
 // --- Cart Functions ---
 function get_cart_count() {
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
+    if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
+        return 0;
     }
+    
     $total_items = 0;
-    foreach ($_SESSION['cart'] as $item) {
-        $total_items += $item['quantity'];
+    foreach ($_SESSION['cart'] as $quantity) {
+        $total_items += $quantity;
     }
     return $total_items;
 }
 
 function get_cart_total() {
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
+    if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
+        return 0;
     }
+    
+    global $conn;
     $total = 0;
-    foreach ($_SESSION['cart'] as $item) {
-        $price = $item['sale_price'] ?? $item['price'];
-        $total += $price * $item['quantity'];
+    
+    // Get product details from database
+    $product_ids = array_keys($_SESSION['cart']);
+    if (empty($product_ids)) {
+        return 0;
     }
+    
+    $placeholders = str_repeat('?,', count($product_ids) - 1) . '?';
+    $stmt = $conn->prepare("SELECT id, price, sale_price FROM products WHERE id IN ($placeholders)");
+    $stmt->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
+    $stmt->execute();
+    $products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    
+    $products_by_id = [];
+    foreach ($products as $product) {
+        $products_by_id[$product['id']] = $product;
+    }
+    
+    foreach ($_SESSION['cart'] as $product_id => $quantity) {
+        $product = $products_by_id[$product_id] ?? null;
+        if ($product) {
+            $price = $product['sale_price'] ?? $product['price'];
+            $total += $price * $quantity;
+        }
+    }
+    
     return $total;
 }
 
@@ -343,12 +369,8 @@ function update_cart_quantity($product_id, $quantity) {
         return remove_from_cart($product_id);
     }
     
-    if (isset($_SESSION['cart'][$product_id])) {
-        $_SESSION['cart'][$product_id]['quantity'] = $quantity;
-        return true;
-    }
-    
-    return false;
+    $_SESSION['cart'][$product_id] = $quantity;
+    return true;
 }
 
 function clear_cart() {
@@ -372,7 +394,10 @@ function slugify($text) {
 }
 
 function format_price($price, $currency = '$') {
-    return $currency . number_format($price, 2);
+    if ($price === null || $price === '') {
+        return $currency . '0.00';
+    }
+    return $currency . number_format((float)$price, 2);
 }
 
 function time_ago($datetime) {
@@ -435,16 +460,16 @@ function get_user_by_id($id, $conn) {
 // --- Menu ---
 function generate_menu($menu_name, $conn) {
     try {
-        $stmt = $conn->prepare("SELECT items FROM menus WHERE name = ?");
+        $stmt = $conn->prepare("SELECT menu_items FROM menus WHERE name = ?");
         $stmt->bind_param("s", $menu_name);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($row = $result->fetch_assoc()) {
-            $menu_items = json_decode($row['items'], true);
+            $menu_items = json_decode($row['menu_items'], true);
             if (is_array($menu_items)) {
                 $html = '<ul class="navbar-nav me-auto mb-2 mb-lg-0">';
                 foreach ($menu_items as $item) {
-                    $label = htmlspecialchars($item['label']);
+                    $label = htmlspecialchars($item['title'] ?? $item['label'] ?? '');
                     $url = $item['url'];
                     
                     // Fix relative URLs to absolute URLs

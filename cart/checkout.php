@@ -111,12 +111,38 @@ include '../includes/header.php';
                     <h5 class="mb-0">Order Summary</h5>
                 </div>
                 <div class="card-body">
-                    <?php foreach ($_SESSION['cart'] as $product_id => $item): ?>
+                    <?php 
+                    $cart_total = 0;
+                    if (!empty($_SESSION['cart'])) {
+                        $product_ids = array_keys($_SESSION['cart']);
+                        $placeholders = str_repeat('?,', count($product_ids) - 1) . '?';
+                        $stmt = $conn->prepare("SELECT id, name, price, sale_price FROM products WHERE id IN ($placeholders)");
+                        $stmt->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
+                        $stmt->execute();
+                        $products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                        $stmt->close();
+                        
+                        $products_by_id = [];
+                        foreach ($products as $product) {
+                            $products_by_id[$product['id']] = $product;
+                        }
+                        
+                        foreach ($_SESSION['cart'] as $product_id => $quantity):
+                            $product = $products_by_id[$product_id] ?? null;
+                            if ($product):
+                                $price = $product['sale_price'] ?? $product['price'];
+                                $line_total = $price * $quantity;
+                                $cart_total += $line_total;
+                    ?>
                         <div class="d-flex justify-content-between mb-2">
-                            <span><?php echo htmlspecialchars($item['name']); ?> x<?php echo $item['quantity']; ?></span>
-                            <span><?php echo format_price(($item['sale_price'] ?? $item['price']) * $item['quantity']); ?></span>
+                            <span><?php echo htmlspecialchars($product['name']); ?> x<?php echo $quantity; ?></span>
+                            <span><?php echo format_price($line_total); ?></span>
                         </div>
-                    <?php endforeach; ?>
+                    <?php 
+                            endif;
+                        endforeach;
+                    }
+                    ?>
                     
                     <hr>
                     

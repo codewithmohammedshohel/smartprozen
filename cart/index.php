@@ -15,7 +15,7 @@ include '../includes/header.php';
             <i class="bi bi-cart-x fs-1 text-muted"></i>
             <h3 class="text-muted mt-3">Your cart is empty</h3>
             <p class="text-muted">Add some products to get started!</p>
-            <a href="/smartprozen/products" class="btn btn-primary">Continue Shopping</a>
+            <a href="<?php echo SITE_URL; ?>/products_list.php" class="btn btn-primary">Continue Shopping</a>
         </div>
     <?php else: ?>
         <div class="row">
@@ -34,33 +34,52 @@ include '../includes/header.php';
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($_SESSION['cart'] as $product_id => $item): ?>
+                                    <?php 
+                                    if (!empty($_SESSION['cart'])) {
+                                        $product_ids = array_keys($_SESSION['cart']);
+                                        $placeholders = str_repeat('?,', count($product_ids) - 1) . '?';
+                                        $stmt = $conn->prepare("SELECT id, name, price, sale_price, featured_image FROM products WHERE id IN ($placeholders)");
+                                        $stmt->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
+                                        $stmt->execute();
+                                        $products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                                        $stmt->close();
+                                        
+                                        $products_by_id = [];
+                                        foreach ($products as $product) {
+                                            $products_by_id[$product['id']] = $product;
+                                        }
+                                        
+                                        foreach ($_SESSION['cart'] as $product_id => $quantity):
+                                            $product = $products_by_id[$product_id] ?? null;
+                                            if ($product):
+                                                $price = $product['sale_price'] ?? $product['price'];
+                                                $product_image = !empty($product['featured_image']) ? 
+                                                    SITE_URL . '/uploads/media/thumb-' . $product['featured_image'] : 
+                                                    'https://placehold.co/80x80/efefef/333?text=' . urlencode($product['name']);
+                                    ?>
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="me-3">
-                                                        <img src="https://placehold.co/80x80/efefef/333?text=Product" alt="Product" class="img-thumbnail">
+                                                        <img src="<?php echo htmlspecialchars($product_image); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="img-thumbnail">
                                                     </div>
                                                     <div>
-                                                        <h6 class="mb-0"><?php echo htmlspecialchars($item['name']); ?></h6>
+                                                        <h6 class="mb-0"><?php echo htmlspecialchars($product['name']); ?></h6>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <?php 
-                                                $price = $item['sale_price'] ?? $item['price'];
-                                                echo format_price($price);
-                                                ?>
+                                                <?php echo format_price($price); ?>
                                             </td>
                                             <td>
                                                 <div class="input-group" style="width: 120px;">
                                                     <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity(<?php echo $product_id; ?>, -1)">-</button>
-                                                    <input type="number" class="form-control form-control-sm text-center" value="<?php echo $item['quantity']; ?>" min="1" onchange="updateQuantity(<?php echo $product_id; ?>, this.value)">
+                                                    <input type="number" class="form-control form-control-sm text-center" value="<?php echo $quantity; ?>" min="1" onchange="updateQuantity(<?php echo $product_id; ?>, this.value)">
                                                     <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity(<?php echo $product_id; ?>, 1)">+</button>
                                                 </div>
                                             </td>
                                             <td>
-                                                <strong><?php echo format_price($price * $item['quantity']); ?></strong>
+                                                <strong><?php echo format_price($price * $quantity); ?></strong>
                                             </td>
                                             <td>
                                                 <button class="btn btn-outline-danger btn-sm" onclick="removeFromCart(<?php echo $product_id; ?>)">
@@ -68,7 +87,11 @@ include '../includes/header.php';
                                                 </button>
                                             </td>
                                         </tr>
-                                    <?php endforeach; ?>
+                                    <?php 
+                                            endif;
+                                        endforeach;
+                                    }
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
@@ -101,7 +124,7 @@ include '../includes/header.php';
                         </div>
                         <div class="d-grid gap-2">
                             <a href="checkout.php" class="btn btn-primary">Proceed to Checkout</a>
-                            <a href="/smartprozen/products" class="btn btn-outline-secondary">Continue Shopping</a>
+                            <a href="<?php echo SITE_URL; ?>/products_list.php" class="btn btn-outline-secondary">Continue Shopping</a>
                         </div>
                     </div>
                 </div>

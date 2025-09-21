@@ -6,7 +6,7 @@ require_once 'core/functions.php';
 $product_id = (int)($_GET['id'] ?? 0);
 
 if ($product_id <= 0) {
-    header('Location: /smartprozen/');
+    header('Location: ' . SITE_URL . '/');
     exit;
 }
 
@@ -17,7 +17,7 @@ $product = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 $product_images = [];
-$stmt_images = $conn->prepare("SELECT image_filename FROM product_images WHERE product_id = ? ORDER BY sort_order ASC");
+$stmt_images = $conn->prepare("SELECT image_filename FROM product_images WHERE product_id = ? ORDER BY display_order ASC");
 $stmt_images->bind_param("i", $product_id);
 $stmt_images->execute();
 $result_images = $stmt_images->get_result();
@@ -27,12 +27,12 @@ while ($row = $result_images->fetch_assoc()) {
 $stmt_images->close();
 
 // If no specific product images, use the main product image as the only one
-if (empty($product_images) && !empty($product['image_filename'])) {
-    $product_images[] = $product['image_filename'];
+if (empty($product_images) && !empty($product['featured_image'])) {
+    $product_images[] = $product['featured_image'];
 }
 
 $reviews = [];
-$stmt_reviews = $conn->prepare("SELECT pr.*, CONCAT(u.first_name, ' ', u.last_name) as user_name FROM product_reviews pr LEFT JOIN users u ON pr.user_id = u.id WHERE pr.product_id = ? AND pr.status = 'approved' ORDER BY pr.created_at DESC");
+$stmt_reviews = $conn->prepare("SELECT r.*, CONCAT(u.first_name, ' ', u.last_name) as user_name FROM reviews r LEFT JOIN users u ON r.user_id = u.id WHERE r.product_id = ? AND r.is_approved = 1 ORDER BY r.created_at DESC");
 $stmt_reviews->bind_param("i", $product_id);
 $stmt_reviews->execute();
 $result_reviews = $stmt_reviews->get_result();
@@ -42,7 +42,7 @@ while ($row = $result_reviews->fetch_assoc()) {
 $stmt_reviews->close();
 
 if (!$product) {
-    header('Location: /smartprozen/');
+    header('Location: ' . SITE_URL . '/');
     exit;
 }
 
@@ -150,19 +150,19 @@ include 'includes/header.php';
                                 <strong><?php echo __('sku'); ?>:</strong> <?php echo htmlspecialchars($product['sku']); ?>
                             </div>
                         <?php endif; ?>
-                        <?php if ($product['file_size']): ?>
+                        <?php if (!empty($product['digital_file'])): ?>
                             <div class="col-sm-6">
-                                <strong><?php echo __('file_size'); ?>:</strong> <?php echo htmlspecialchars($product['file_size']); ?>
+                                <strong><?php echo 'File'; ?>:</strong> <?php echo htmlspecialchars(basename($product['digital_file'])); ?>
                             </div>
                         <?php endif; ?>
-                        <?php if ($product['is_digital']): ?>
+                        <?php if ($product['product_type'] === 'digital'): ?>
                             <div class="col-sm-6">
-                                <strong><?php echo __('product_type'); ?>:</strong> <?php echo __('digital_product'); ?>
+                                <strong><?php echo 'Product Type'; ?>:</strong> <?php echo 'Digital Product'; ?>
                             </div>
                         <?php endif; ?>
                         <div class="col-sm-6">
-                            <strong><?php echo __('availability'); ?>:</strong> 
-                            <span class="text-success"><?php echo __('in_stock'); ?></span>
+                            <strong><?php echo 'Availability'; ?>:</strong> 
+                            <span class="text-success"><?php echo ucfirst($product['stock_status'] ?? 'instock'); ?></span>
                         </div>
                     </div>
                 </div>
@@ -170,13 +170,13 @@ include 'includes/header.php';
         </div>
     </div>
     
-    <?php if ($product['tags']): ?>
+    <?php if (!empty($product['meta_keywords'])): ?>
         <div class="row mt-5">
             <div class="col-12">
                 <h5><?php echo __('tags'); ?>:</h5>
                 <div class="tags">
                     <?php
-                    $tags = !empty($product['tags']) ? array_map('trim', explode(',', $product['tags'])) : [];
+                    $tags = !empty($product['meta_keywords']) ? array_map('trim', explode(',', $product['meta_keywords'])) : [];
                     if (!empty($tags)) {
                         foreach ($tags as $tag) {
                             echo '<span class="badge bg-secondary me-2 mb-2">' . htmlspecialchars($tag) . '</span>';
@@ -231,12 +231,12 @@ include 'includes/header.php';
                         <div class="card mb-3">
                             <div class="card-body">
                                 <h5 class="card-title mb-1">
-                                    <?php echo htmlspecialchars($review['reviewer_name'] ?: $review['user_name'] ?: __('anonymous')); ?>
+                                    <?php echo htmlspecialchars($review['guest_name'] ?? $review['user_name'] ?? 'Anonymous'); ?>
                                 </h5>
                                 <div class="text-muted small mb-2">
                                     <?php for ($i = 0; $i < $review['rating']; $i++): ?><span class="text-warning">&#9733;</span><?php endfor; ?>
                                     <?php for ($i = $review['rating']; $i < 5; $i++): ?><span class="text-muted">&#9733;</span><?php endfor; ?>
-                                    - <?php echo time_elapsed_string($review['created_at']); ?>
+                                    - <?php echo date('M j, Y', strtotime($review['created_at'])); ?>
                                 </div>
                                 <p class="card-text"><?php echo nl2br(htmlspecialchars($review['comment'])); ?></p>
                             </div>

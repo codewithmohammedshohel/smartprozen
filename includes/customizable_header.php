@@ -137,14 +137,36 @@ body {
                         <?php if ($header_menu && is_array($header_menu)): ?>
                             <?php foreach ($header_menu as $item): ?>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link" href="<?php echo htmlspecialchars($item['url']); ?>" 
+                                    <?php 
+                                    $url = $item['url'];
+                                    // Fix relative URLs to absolute URLs
+                                    if (strpos($url, 'http') !== 0) {
+                                        if (strpos($url, '/') === 0) {
+                                            $url = SITE_URL . $url;
+                                        } else {
+                                            $url = SITE_URL . '/' . $url;
+                                        }
+                                    }
+                                    ?>
+                                    <a class="nav-link" href="<?php echo htmlspecialchars($url); ?>" 
                                        <?php echo isset($item['children']) ? 'data-bs-toggle="dropdown"' : ''; ?>>
                                         <?php echo htmlspecialchars($item['title']); ?>
                                     </a>
                                     <?php if (isset($item['children'])): ?>
                                         <ul class="dropdown-menu">
                                             <?php foreach ($item['children'] as $child): ?>
-                                                <li><a class="dropdown-item" href="<?php echo htmlspecialchars($child['url']); ?>">
+                                                <?php 
+                                                $child_url = $child['url'];
+                                                // Fix relative URLs to absolute URLs
+                                                if (strpos($child_url, 'http') !== 0) {
+                                                    if (strpos($child_url, '/') === 0) {
+                                                        $child_url = SITE_URL . $child_url;
+                                                    } else {
+                                                        $child_url = SITE_URL . '/' . $child_url;
+                                                    }
+                                                }
+                                                ?>
+                                                <li><a class="dropdown-item" href="<?php echo htmlspecialchars($child_url); ?>">
                                                     <?php echo htmlspecialchars($child['title']); ?>
                                                 </a></li>
                                             <?php endforeach; ?>
@@ -160,14 +182,36 @@ body {
                         <?php if ($header_menu && is_array($header_menu)): ?>
                             <?php foreach ($header_menu as $item): ?>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link" href="<?php echo htmlspecialchars($item['url']); ?>" 
+                                    <?php 
+                                    $url = $item['url'];
+                                    // Fix relative URLs to absolute URLs
+                                    if (strpos($url, 'http') !== 0) {
+                                        if (strpos($url, '/') === 0) {
+                                            $url = SITE_URL . $url;
+                                        } else {
+                                            $url = SITE_URL . '/' . $url;
+                                        }
+                                    }
+                                    ?>
+                                    <a class="nav-link" href="<?php echo htmlspecialchars($url); ?>" 
                                        <?php echo isset($item['children']) ? 'data-bs-toggle="dropdown"' : ''; ?>>
                                         <?php echo htmlspecialchars($item['title']); ?>
                                     </a>
                                     <?php if (isset($item['children'])): ?>
                                         <ul class="dropdown-menu">
                                             <?php foreach ($item['children'] as $child): ?>
-                                                <li><a class="dropdown-item" href="<?php echo htmlspecialchars($child['url']); ?>">
+                                                <?php 
+                                                $child_url = $child['url'];
+                                                // Fix relative URLs to absolute URLs
+                                                if (strpos($child_url, 'http') !== 0) {
+                                                    if (strpos($child_url, '/') === 0) {
+                                                        $child_url = SITE_URL . $child_url;
+                                                    } else {
+                                                        $child_url = SITE_URL . '/' . $child_url;
+                                                    }
+                                                }
+                                                ?>
+                                                <li><a class="dropdown-item" href="<?php echo htmlspecialchars($child_url); ?>">
                                                     <?php echo htmlspecialchars($child['title']); ?>
                                                 </a></li>
                                             <?php endforeach; ?>

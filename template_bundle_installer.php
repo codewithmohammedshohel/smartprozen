@@ -250,8 +250,9 @@ try {
         ]
     ];
     
+    $main_menu_json = json_encode($main_menu);
     $stmt = $conn->prepare("INSERT IGNORE INTO menus (name, location, menu_items, is_active) VALUES ('Main Menu', 'header', ?, 1)");
-    $stmt->bind_param("s", json_encode($main_menu));
+    $stmt->bind_param("s", $main_menu_json);
     $stmt->execute();
     $stmt->close();
     echo "<p>✅ Created main navigation menu</p>";
@@ -268,8 +269,9 @@ try {
         ['title' => 'FAQ', 'url' => '/faq']
     ];
     
+    $footer_menu_json = json_encode($footer_menu);
     $stmt = $conn->prepare("INSERT IGNORE INTO menus (name, location, menu_items, is_active) VALUES ('Footer Menu', 'footer', ?, 1)");
-    $stmt->bind_param("s", json_encode($footer_menu));
+    $stmt->bind_param("s", $footer_menu_json);
     $stmt->execute();
     $stmt->close();
     echo "<p>✅ Created footer menu</p>";
@@ -278,15 +280,15 @@ try {
     
     // Sample coupons
     $coupons = [
-        ['WELCOME10', 'Welcome Discount', 'Get 10% off your first order', 'percentage', 10, null, '2025-12-31', 100, 0, 1, 1],
-        ['SAVE20', 'Flash Sale', 'Save $20 on orders over $100', 'fixed', null, 20, '2025-12-31', 50, 0, 1, 1],
-        ['STUDENT15', 'Student Discount', '15% off for students with valid ID', 'percentage', 15, null, '2025-12-31', 25, 0, 1, 1],
-        ['BULK25', 'Bulk Purchase', '25% off orders of 5 or more items', 'percentage', 25, null, '2025-12-31', 30, 0, 1, 1]
+        ['WELCOME10', 'Welcome Discount', 'Get 10% off your first order', 'percentage', 10, null, null, '2025-12-31', 100, 0, 1],
+        ['SAVE20', 'Flash Sale', 'Save $20 on orders over $100', 'fixed', null, 20, 100, '2025-12-31', 50, 0, 1],
+        ['STUDENT15', 'Student Discount', '15% off for students with valid ID', 'percentage', 15, null, null, '2025-12-31', 25, 0, 1],
+        ['BULK25', 'Bulk Purchase', '25% off orders of 5 or more items', 'percentage', 25, null, null, '2025-12-31', 30, 0, 1]
     ];
     
     foreach ($coupons as $coupon) {
-        $stmt = $conn->prepare("INSERT IGNORE INTO coupons (code, name, description, discount_type, discount_value, discount_amount, expiry_date, usage_limit, used_count, is_active, is_published) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssssdssiii", $coupon[0], $coupon[1], $coupon[2], $coupon[3], $coupon[4], $coupon[5], $coupon[6], $coupon[7], $coupon[8], $coupon[9], $coupon[10]);
+        $stmt = $conn->prepare("INSERT IGNORE INTO coupons (code, description, discount_type, discount_value, minimum_amount, maximum_discount, usage_limit, valid_until, used_count, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssdddssii", $coupon[0], $coupon[1], $coupon[2], $coupon[3], $coupon[4], $coupon[5], $coupon[6], $coupon[7], $coupon[8], $coupon[9]);
         $stmt->execute();
         $stmt->close();
         echo "<p>✅ Created coupon: {$coupon[0]} - {$coupon[1]}</p>";
@@ -296,16 +298,16 @@ try {
     
     // Sample reviews for products
     $reviews = [
-        [1, 1, 5, 'Excellent smart hub! Easy to set up and works perfectly with all my devices.', 1, 1],
-        [2, 2, 5, 'Great audio quality. These headphones are perfect for professional work.', 1, 1],
-        [3, 3, 4, 'Good wireless charging pad. Charges my phone quickly and looks great on my desk.', 1, 1],
-        [4, 4, 5, 'Love this smartwatch! The fitness tracking features are incredibly accurate.', 1, 1],
-        [5, 5, 5, 'Best gaming keyboard I\'ve ever used. The RGB lighting is amazing!', 1, 1]
+        [1, 1, 5, 'Excellent smart hub! Easy to set up and works perfectly with all my devices.', 1],
+        [2, 2, 5, 'Great audio quality. These headphones are perfect for professional work.', 1],
+        [3, 3, 4, 'Good wireless charging pad. Charges my phone quickly and looks great on my desk.', 1],
+        [4, 4, 5, 'Love this smartwatch! The fitness tracking features are incredibly accurate.', 1],
+        [5, 5, 5, 'Best gaming keyboard I have ever used. The RGB lighting is amazing!', 1]
     ];
     
     foreach ($reviews as $review) {
-        $stmt = $conn->prepare("INSERT IGNORE INTO reviews (product_id, user_id, rating, review_text, is_approved, is_featured) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("iiisii", $review[0], $review[1], $review[2], $review[3], $review[4], $review[5]);
+        $stmt = $conn->prepare("INSERT IGNORE INTO reviews (product_id, user_id, rating, comment, is_approved) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("iiisi", $review[0], $review[1], $review[2], $review[3], $review[4]);
         $stmt->execute();
         $stmt->close();
     }

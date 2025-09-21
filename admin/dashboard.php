@@ -57,9 +57,9 @@ $top_selling_products_query = $conn->query("SELECT p.id, p.name, SUM(oi.quantity
 $top_selling_products = $top_selling_products_query->fetch_all(MYSQLI_ASSOC);
 
 // Fetch Recent Orders List
-$recent_orders_query = $conn->query("SELECT o.id, o.total_amount, o.status, u.name as customer_name, o.created_at
+$recent_orders_query = $conn->query("SELECT o.id, o.total_amount, o.status, CONCAT(u.first_name, ' ', u.last_name) as customer_name, o.created_at
                                      FROM orders o
-                                     JOIN users u ON o.user_id = u.id
+                                     LEFT JOIN users u ON o.user_id = u.id
                                      ORDER BY o.created_at DESC
                                      LIMIT 5");
 $recent_orders = $recent_orders_query->fetch_all(MYSQLI_ASSOC);

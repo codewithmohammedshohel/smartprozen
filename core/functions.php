@@ -249,6 +249,135 @@ function is_module_enabled($slug, $conn) {
     return $modules[$slug] ?? false;
 }
 
+// --- Cart Functions ---
+function get_cart_count() {
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+    $total_items = 0;
+    foreach ($_SESSION['cart'] as $item) {
+        $total_items += $item['quantity'];
+    }
+    return $total_items;
+}
+
+function get_cart_total() {
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+    $total = 0;
+    foreach ($_SESSION['cart'] as $item) {
+        $price = $item['sale_price'] ?? $item['price'];
+        $total += $price * $item['quantity'];
+    }
+    return $total;
+}
+
+function add_to_cart($product_id, $quantity = 1) {
+    global $conn;
+    
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+    
+    // Get product details
+    $stmt = $conn->prepare("SELECT id, name, price, sale_price, stock_quantity, stock_status FROM products WHERE id = ? AND is_published = 1");
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $product = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    
+    if (!$product) {
+        return false;
+    }
+    
+    // Check stock
+    if ($product['stock_status'] === 'outofstock') {
+        return false;
+    }
+    
+    if ($product['stock_quantity'] < $quantity) {
+        return false;
+    }
+    
+    $cart_key = $product_id;
+    
+    if (isset($_SESSION['cart'][$cart_key])) {
+        $_SESSION['cart'][$cart_key]['quantity'] += $quantity;
+    } else {
+        $_SESSION['cart'][$cart_key] = [
+            'product_id' => $product_id,
+            'name' => $product['name'],
+            'price' => $product['price'],
+            'sale_price' => $product['sale_price'],
+            'quantity' => $quantity
+        ];
+    }
+    
+    return true;
+}
+
+function remove_from_cart($product_id) {
+    if (isset($_SESSION['cart'][$product_id])) {
+        unset($_SESSION['cart'][$product_id]);
+        return true;
+    }
+    return false;
+}
+
+function update_cart_quantity($product_id, $quantity) {
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+    
+    if ($quantity <= 0) {
+        return remove_from_cart($product_id);
+    }
+    
+    if (isset($_SESSION['cart'][$product_id])) {
+        $_SESSION['cart'][$product_id]['quantity'] = $quantity;
+        return true;
+    }
+    
+    return false;
+}
+
+function clear_cart() {
+    $_SESSION['cart'] = [];
+    return true;
+}
+
+// --- User Functions ---
+// Note: get_logged_in_user() function already exists above
+
+// --- Helper Functions ---
+function slugify($text) {
+    $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+    $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+    $text = preg_replace('~[^-\w]+~', '', $text);
+    $text = trim($text, '-');
+    $text = preg_replace('~-+~', '-', $text);
+    $text = strtolower($text);
+    
+    return $text;
+}
+
+function format_price($price, $currency = '$') {
+    return $currency . number_format($price, 2);
+}
+
+function time_ago($datetime) {
+    $time = time() - strtotime($datetime);
+    
+    if ($time < 60) return 'just now';
+    if ($time < 3600) return floor($time/60) . ' minutes ago';
+    if ($time < 86400) return floor($time/3600) . ' hours ago';
+    if ($time < 2592000) return floor($time/86400) . ' days ago';
+    if ($time < 31536000) return floor($time/2592000) . ' months ago';
+    
+    return floor($time/31536000) . ' years ago';
+}
+
 // --- Logging ---
 function log_activity($user_type, $user_id, $action, $details) {
     global $conn;
@@ -260,15 +389,7 @@ function log_activity($user_type, $user_id, $action, $details) {
 }
 
 // --- Utilities ---
-function slugify($text) {
-    $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-    $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-    $text = preg_replace('~[^-\w]+~', '', $text);
-    $text = trim($text, '-');
-    $text = preg_replace('~-+~', '-', $text);
-    $text = strtolower($text);
-    return $text;
-}
+// Note: slugify() function already exists above
 
 /**
  * Checks if a string is a valid JSON.

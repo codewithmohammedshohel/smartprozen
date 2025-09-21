@@ -1,125 +1,146 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../core/db.php';
-require_once __DIR__ . '/../core/functions.php';
-require_once __DIR__ . '/../includes/header.php';
-
-
+require_once '../config.php';
+require_once '../core/db.php';
+require_once '../core/functions.php';
 
 if (empty($_SESSION['cart'])) {
-    header('Location: /smartprozen/cart/');
+    header('Location: index.php');
     exit;
 }
 
-$cart_items = [];
-$subtotal = 0;
-$product_ids = array_keys($_SESSION['cart']);
-$placeholders = implode(',', array_fill(0, count($product_ids), '?'));
-$stmt = $conn->prepare("SELECT * FROM products WHERE id IN ($placeholders)");
-$stmt->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
-$stmt->execute();
-$result = $stmt->get_result();
-while ($product = $result->fetch_assoc()) {
-    $product['quantity'] = $_SESSION['cart'][$product['id']];
-    $cart_items[] = $product;
-    $subtotal += $product['price'] * $product['quantity'];
-}
-
-$discount = $_SESSION['discount_amount'] ?? 0;
-$total = $subtotal - $discount;
-
-if (is_logged_in()) {
-    $user = get_user_by_id($_SESSION['user_id'], $conn);
-} else {
-    $user = null;
-}
-
+$page_title = 'Checkout';
+include '../includes/header.php';
 ?>
-<div class="container py-5">
+
+<div class="container my-5">
     <h1 class="mb-4">Checkout</h1>
+    
     <div class="row">
-        <div class="col-md-7">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h2 class="card-title h4">Shipping Information</h2>
-                    <form id="checkout-form">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Address</label>
-                            <input type="text" class="form-control" id="address" name="address" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="contact_number" class="form-label">Contact Number</label>
-                            <input type="text" class="form-control" id="contact_number" name="contact_number" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="whatsapp_number" class="form-label">WhatsApp Number (Optional)</label>
-                            <input type="text" class="form-control" id="whatsapp_number" name="whatsapp_number">
-                        </div>
+        <div class="col-lg-8">
+            <form id="checkoutForm">
+                <!-- Billing Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Billing Information</h5>
+                    </div>
+                    <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">City</label>
-                                <input type="text" class="form-control" id="city" name="city" required>
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="firstName" name="first_name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="zip" class="form-label">ZIP Code</label>
-                                <input type="text" class="form-control" id="zip" name="zip" required>
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="lastName" name="last_name" required>
                             </div>
                         </div>
-                        
-                        <h2 class="card-title h4 mt-4">Payment Method</h2>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_method" id="cod" value="cod" checked>
-                            <label class="form-check-label" for="cod">
-                                Cash on Delivery
-                            </label>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_method" id="stripe" value="stripe" disabled>
-                            <label class="form-check-label" for="stripe">
-                                Credit Card (Stripe) - Coming Soon
-                            </label>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone">
                         </div>
-                    </form>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address *</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="city" class="form-label">City *</label>
+                                <input type="text" class="form-control" id="city" name="city" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="state" class="form-label">State *</label>
+                                <input type="text" class="form-control" id="state" name="state" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="zip" class="form-label">ZIP Code *</label>
+                                <input type="text" class="form-control" id="zip" name="zip_code" required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h2 class="card-title h4">Order Summary</h2>
-                    <ul class="list-group list-group-flush">
-                        <?php foreach ($cart_items as $item): ?>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <?php echo get_translated_text($item['name'], 'name'); ?> (x<?php echo $item['quantity']; ?>)
-                                <span>$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                        <strong>Subtotal</strong>
-                        <strong>$<?php echo number_format($subtotal, 2); ?></strong>
+                
+                <!-- Payment Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Payment Information</h5>
                     </div>
-                    <?php if ($discount > 0): ?>
-                        <div class="d-flex justify-content-between align-items-center text-danger">
-                            <span>Discount (<?php echo $_SESSION['coupon_code']; ?>)</span>
-                            <span>-$<?php echo number_format($discount, 2); ?></span>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Payment Method</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="creditCard" value="credit_card" checked>
+                                <label class="form-check-label" for="creditCard">
+                                    Credit Card
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="paypal" value="paypal">
+                                <label class="form-check-label" for="paypal">
+                                    PayPal
+                                </label>
+                            </div>
                         </div>
-                    <?php endif; ?>
-                    <div class="d-flex justify-content-between align-items-center mt-2 h5">
-                        <strong>Total</strong>
-                        <strong>$<?php echo number_format($total, 2); ?></strong>
+                        <div id="creditCardFields">
+                            <div class="mb-3">
+                                <label for="cardNumber" class="form-label">Card Number *</label>
+                                <input type="text" class="form-control" id="cardNumber" name="card_number" placeholder="1234 5678 9012 3456">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="expiryDate" class="form-label">Expiry Date *</label>
+                                    <input type="text" class="form-control" id="expiryDate" name="expiry_date" placeholder="MM/YY">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cvv" class="form-label">CVV *</label>
+                                    <input type="text" class="form-control" id="cvv" name="cvv" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="d-grid mt-4">
-                        <button type="submit" form="checkout-form" class="btn btn-primary btn-lg">Place Order</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <?php foreach ($_SESSION['cart'] as $product_id => $item): ?>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><?php echo htmlspecialchars($item['name']); ?> x<?php echo $item['quantity']; ?></span>
+                            <span><?php echo format_price(($item['sale_price'] ?? $item['price']) * $item['quantity']); ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span><?php echo format_price(get_cart_total()); ?></span>
                     </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span>$9.99</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Tax:</span>
+                        <span>$0.00</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong><?php echo format_price(get_cart_total() + 9.99); ?></strong>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary w-100" onclick="placeOrder()">Place Order</button>
                 </div>
             </div>
         </div>
@@ -127,41 +148,44 @@ if (is_logged_in()) {
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const checkoutForm = document.getElementById('checkout-form');
-    const placeOrderBtn = document.querySelector('button[form="checkout-form"]');
+function placeOrder() {
+    const form = document.getElementById('checkoutForm');
+    const formData = new FormData(form);
+    
+    // Add cart data
+    formData.append('cart_data', JSON.stringify(<?php echo json_encode($_SESSION['cart']); ?>));
+    formData.append('total_amount', <?php echo get_cart_total() + 9.99; ?>);
+    
+    fetch('place_order.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Order placed successfully!');
+            window.location.href = '/smartprozen/order_confirmation.php?order_id=' + data.order_id;
+        } else {
+            alert('Error placing order: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
 
-    if (checkoutForm && placeOrderBtn) {
-        placeOrderBtn.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent default button submission
-
-            // Manually trigger form submission to ensure validation runs
-            if (!checkoutForm.checkValidity()) {
-                checkoutForm.reportValidity();
-                return;
-            }
-
-            const formData = new FormData(checkoutForm);
-
-            fetch('/smartprozen/cart/place_order.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/smartprozen/user/downloads.php';
-                } else {
-                    alert('Error placing order: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while placing your order. Please try again.');
-            });
-        });
-    }
+// Show/hide credit card fields based on payment method
+document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const creditCardFields = document.getElementById('creditCardFields');
+        if (this.value === 'credit_card') {
+            creditCardFields.style.display = 'block';
+        } else {
+            creditCardFields.style.display = 'none';
+        }
+    });
 });
 </script>
 
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

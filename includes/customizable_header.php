@@ -113,13 +113,13 @@ body {
             <?php if ($header_layout === 'centered'): ?>
                 <!-- Centered Layout -->
                 <div class="navbar-brand mx-auto d-flex align-items-center">
-                    <img src="<?php echo $site_logo; ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
+                    <img src="<?php echo SITE_URL . $site_logo; ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
                     <span class="fs-4 fw-bold"><?php echo htmlspecialchars($site_name); ?></span>
                 </div>
             <?php else: ?>
                 <!-- Default and Minimal Layout -->
                 <a class="navbar-brand d-flex align-items-center" href="<?php echo SITE_URL; ?>">
-                    <img src="<?php echo $site_logo; ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
+                    <img src="<?php echo SITE_URL . $site_logo; ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
                     <?php if ($header_layout !== 'minimal'): ?>
                         <span class="fs-4 fw-bold"><?php echo htmlspecialchars($site_name); ?></span>
                     <?php endif; ?>
@@ -183,7 +183,7 @@ body {
                 <div class="d-flex align-items-center">
                     <!-- Search -->
                     <div class="me-3">
-                        <form class="d-flex" action="/smartprozen/search.php" method="GET">
+                        <form class="d-flex" action="<?php echo SITE_URL; ?>/search.php" method="GET">
                             <input class="form-control form-control-sm" type="search" name="q" placeholder="Search..." style="width: 200px;">
                             <button class="btn btn-outline-secondary btn-sm ms-1" type="submit">
                                 <i class="bi bi-search"></i>
@@ -198,24 +198,24 @@ body {
                                 <i class="bi bi-person"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/smartprozen/user/dashboard.php">
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/dashboard.php">
                                     <i class="bi bi-speedometer2"></i> Dashboard
                                 </a></li>
-                                <li><a class="dropdown-item" href="/smartprozen/user/orders.php">
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/orders.php">
                                     <i class="bi bi-box-seam"></i> Orders
                                 </a></li>
-                                <li><a class="dropdown-item" href="/smartprozen/user/profile.php">
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/profile.php">
                                     <i class="bi bi-person-gear"></i> Profile
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/smartprozen/auth/logout.php">
+                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/auth/logout.php">
                                     <i class="bi bi-box-arrow-right"></i> Logout
                                 </a></li>
                             </ul>
                         </div>
                     <?php else: ?>
                         <div class="me-2">
-                            <a href="/smartprozen/auth/login.php" class="btn btn-outline-secondary">
+                            <a href="<?php echo SITE_URL; ?>/auth/login.php" class="btn btn-outline-secondary">
                                 <i class="bi bi-person"></i> Login
                             </a>
                         </div>
@@ -223,10 +223,10 @@ body {
 
                     <!-- Cart -->
                     <div class="dropdown">
-                        <a class="btn btn-primary position-relative" href="/smartprozen/cart/" data-bs-toggle="dropdown">
+                        <a class="btn btn-primary position-relative" href="<?php echo SITE_URL; ?>/cart/" data-bs-toggle="dropdown">
                             <i class="bi bi-cart"></i>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count">
-                                <?php echo get_cart_count(); ?>
+                                <?php echo function_exists('get_cart_count') ? get_cart_count() : 0; ?>
                             </span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" style="width: 300px;">
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadCartDropdown() {
-    fetch('/smartprozen/cart/get_cart_quantities.php')
+    fetch('<?php echo SITE_URL; ?>/cart/get_cart_quantities.php')
         .then(response => response.json())
         .then(data => {
             const cartContent = document.getElementById('cart-dropdown-content');
@@ -283,8 +283,8 @@ function loadCartDropdown() {
                         <strong>$${total.toFixed(2)}</strong>
                     </div>
                     <div class="d-grid gap-2">
-                        <a href="/smartprozen/cart/" class="btn btn-primary btn-sm">View Cart</a>
-                        <a href="/smartprozen/cart/checkout.php" class="btn btn-success btn-sm">Checkout</a>
+                        <a href="<?php echo SITE_URL; ?>/cart/" class="btn btn-primary btn-sm">View Cart</a>
+                        <a href="<?php echo SITE_URL; ?>/cart/checkout.php" class="btn btn-success btn-sm">Checkout</a>
                     </div>
                 </div>
                 `;
@@ -295,7 +295,7 @@ function loadCartDropdown() {
                     <div class="p-3 text-center">
                         <i class="bi bi-cart-x fs-1 text-muted"></i>
                         <p class="text-muted mt-2">Your cart is empty</p>
-                        <a href="/smartprozen/products" class="btn btn-primary btn-sm">Shop Now</a>
+                        <a href="<?php echo SITE_URL; ?>/products_list.php" class="btn btn-primary btn-sm">Shop Now</a>
                     </div>
                 `;
             }

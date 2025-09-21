@@ -96,6 +96,9 @@ if ($environment === 'local') {
 // Other configurations
 define('DEFAULT_LANG', 'en');
 define('TIMEZONE', 'UTC');
+define('IS_LOCAL', $environment === 'local');
+define('IS_PRODUCTION', $environment === 'production');
+define('ENVIRONMENT', $environment);
 
 ini_set('display_errors', 0); // Disable display of errors in production
 ini_set('log_errors', 1); // Enable error logging

@@ -35,7 +35,7 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
             <div class="row py-4">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center">
-                        <img src="<?php echo get_setting('site_logo', '/uploads/logos/logo.png'); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="30" class="me-2">
+                        <img src="<?php echo SITE_URL . get_setting('site_logo', '/uploads/logos/logo.png'); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="30" class="me-2">
                         <span class="fw-bold"><?php echo htmlspecialchars($site_name); ?></span>
                     </div>
                     <p class="text-muted mb-0 mt-2"><?php echo htmlspecialchars($site_description); ?></p>
@@ -50,7 +50,7 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
                 <!-- Company Info -->
                 <div class="col-lg-4 mb-4">
                     <div class="d-flex align-items-center mb-3">
-                        <img src="<?php echo get_setting('site_logo', '/uploads/logos/logo.png'); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
+                        <img src="<?php echo SITE_URL . get_setting('site_logo', '/uploads/logos/logo.png'); ?>" alt="<?php echo htmlspecialchars($site_name); ?>" height="40" class="me-2">
                         <h5 class="mb-0 fw-bold"><?php echo htmlspecialchars($site_name); ?></h5>
                     </div>
                     <p class="text-muted mb-3"><?php echo htmlspecialchars($site_description); ?></p>
@@ -95,11 +95,11 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">Customer Service</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/smartprozen/shipping" class="text-muted text-decoration-none">Shipping Info</a></li>
-                        <li class="mb-2"><a href="/smartprozen/returns" class="text-muted text-decoration-none">Returns</a></li>
-                        <li class="mb-2"><a href="/smartprozen/contact" class="text-muted text-decoration-none">Contact Us</a></li>
-                        <li class="mb-2"><a href="/smartprozen/faq" class="text-muted text-decoration-none">FAQ</a></li>
-                        <li class="mb-2"><a href="/smartprozen/support" class="text-muted text-decoration-none">Support</a></li>
+                        <li class="mb-2"><a href="<?php echo SITE_URL; ?>/page/shipping" class="text-muted text-decoration-none">Shipping Info</a></li>
+                        <li class="mb-2"><a href="<?php echo SITE_URL; ?>/page/returns" class="text-muted text-decoration-none">Returns</a></li>
+                        <li class="mb-2"><a href="<?php echo SITE_URL; ?>/contact.php" class="text-muted text-decoration-none">Contact Us</a></li>
+                        <li class="mb-2"><a href="<?php echo SITE_URL; ?>/page/faq" class="text-muted text-decoration-none">FAQ</a></li>
+                        <li class="mb-2"><a href="<?php echo SITE_URL; ?>/page/support" class="text-muted text-decoration-none">Support</a></li>
                     </ul>
                 </div>
 
@@ -129,7 +129,7 @@ $primary_color = $theme_settings['primary_color'] ?? '#007bff';
                     <div class="newsletter-signup mt-4">
                         <h6 class="fw-bold mb-2">Newsletter</h6>
                         <p class="text-muted small mb-3">Subscribe to get updates and exclusive offers</p>
-                        <form class="d-flex" action="/smartprozen/newsletter/subscribe.php" method="POST">
+                        <form class="d-flex" action="<?php echo SITE_URL; ?>/newsletter/subscribe.php" method="POST">
                             <input type="email" name="email" class="form-control form-control-sm" placeholder="Your email" required>
                             <button type="submit" class="btn btn-primary btn-sm ms-2">Subscribe</button>
                         </form>
@@ -257,7 +257,7 @@ document.querySelectorAll('form[action*="newsletter"]').forEach(form => {
             return;
         }
         
-        fetch('/smartprozen/newsletter/subscribe.php', {
+        fetch('<?php echo SITE_URL; ?>/newsletter/subscribe.php', {
             method: 'POST',
             body: formData
         })

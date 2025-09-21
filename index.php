@@ -116,7 +116,7 @@ if ($result->num_rows > 0) { // Re-enabled check for custom homepage
             </div>
         </div>
         <div class="text-center mt-5">
-            <a href="/smartprozen/products_list.php" class="btn btn-outline-primary">View All Best Sellers</a>
+            <a href="<?php echo SITE_URL; ?>/products_list.php" class="btn btn-outline-primary">View All Best Sellers</a>
         </div>
     </div>
 </section>

@@ -1,0 +1,24 @@
+<?php
+// --- DATABASE ---
+define('DB_HOST', '{{DB_HOST}}');
+define('DB_USER', '{{DB_USER}}');
+define('DB_PASS', '{{DB_PASS}}');
+define('DB_NAME', '{{DB_NAME}}');
+
+// --- SITE URL ---
+define('SITE_URL', '{{SITE_URL}}');
+
+// --- EMAIL (SMTP for reliable delivery) ---
+// Please update these settings manually after installation
+define('SMTP_HOST', 'smtp.example.com'); 
+define('SMTP_USER', 'you@example.com');
+define('SMTP_PASS', 'your_email_password');
+define('SMTP_PORT', 587);
+define('SMTP_FROM_EMAIL', 'no-reply@smartprozen.com');
+define('SMTP_FROM_NAME', 'SmartProzen');
+
+// --- START SESSION ---
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>

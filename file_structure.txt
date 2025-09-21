@@ -1,0 +1,94 @@
+smartprozen/
+├── admin/
+│   ├── dashboard.php
+│   ├── manage_admins.php
+│   ├── manage_coupons.php
+│   ├── manage_customers.php
+│   ├── manage_gateways.php
+│   ├── manage_menu.php
+│   ├── manage_modules.php
+│   ├── manage_pages.php
+│   ├── manage_posts.php
+│   ├── manage_products.php
+│   ├── manage_roles.php
+│   ├── media_library.php
+│   ├── page_builder.php
+│   ├── reports.php
+│   ├── generate_report.php
+│   ├── settings.php
+│   ├── theme_settings.php
+│   ├── update_order_status.php
+│   └── view_orders.php
+├── api/
+│   └── sales_data.php
+├── assets/
+│   └── fonts/
+│       └── custom/
+├── auth/
+│   ├── admin_login.php
+│   ├── forgot_password.php
+│   ├── login.php
+│   ├── logout.php
+│   ├── register.php
+│   ├── reset_password.php
+│   └── social_handler.php
+├── cart/
+│   ├── add_to_cart.php
+│   ├── apply_coupon.php
+│   ├── checkout.php
+│   ├── index.php
+│   ├── place_order.php
+│   └── update_cart.php
+├── core/
+│   ├── db.php
+│   ├── email_handler.php
+│   ├── functions.php
+│   └── media_handler.php
+├── css/
+│   ├── admin.css
+│   ├── corporate.css
+│   ├── dark.css
+│   └── default.css
+├── includes/
+│   ├── admin_header.php
+│   ├── admin_sidebar.php
+│   ├── footer.php
+│   ├── header.php
+│   ├── user_header.php
+│   ├── user_sidebar.php
+│   └── whatsapp_icon.php
+├── lang/
+│   ├── bn.json
+│   └── en.json
+├── lib/
+│   ├── fpdf/
+│   ├── google-authenticator/
+│   └── phpspreadsheet/
+├── templates/
+│   └── sections/
+│       ├── faq.php
+│       ├── featured_products.php
+│       ├── hero.php
+│       └── rich_text.php
+├── user/
+│   ├── dashboard.php
+│   ├── downloads.php
+│   ├── orders.php
+│   └── profile.php
+├── uploads/
+│   ├── files/
+│   ├── logos/
+│   ├── media/
+│   └── sections/
+├── .htaccess
+├── config.php.template
+├── contact.php
+├── download.php
+├── index.php
+├── order_confirmation.php
+├── page.php
+├── post.php
+├── product.php
+├── schema.sql
+├── setup.php
+└── sitemap.php

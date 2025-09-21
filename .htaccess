@@ -1,0 +1,23 @@
+RewriteEngine On
+RewriteBase /smartprozen/
+
+# Redirect non-www to www (optional)
+# RewriteCond %{HTTP_HOST} ^yourdomain.com [NC]
+# RewriteRule ^(.*)$ http://www.yourdomain.com/$1 [L,R=301]
+
+# Route for dynamic pages
+RewriteRule ^page/([a-zA-Z0-9-]+)/?$ page.php?slug=$1 [L,QSA]
+RewriteRule ^blog/([a-zA-Z0-9-]+)/?$ post.php?slug=$1 [L,QSA]
+
+# Rewrite requests for existing PHP files in the root without their .php extension
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([a-zA-Z0-9-]+)/?$ $1.php [L,QSA]
+
+# Block access to sensitive files
+<FilesMatch "\.(sql|log|ini|env|tpl|template|bak)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes

@@ -124,68 +124,7 @@ $favicon_filename = $settings['favicon_filename'] ?? '';
 
 <body class="d-flex flex-column min-vh-100">
 
-    <header class="navbar navbar-expand-lg shadow-sm sticky-top bg-gradient">
-        <div class="container py-3">
-            <a class="navbar-brand d-flex align-items-center" href="<?php echo SITE_URL; ?>/">
-                <?php if ($logo_filename && file_exists(__DIR__ . '/../uploads/logos/' . $logo_filename)): ?>
-                    <img src="<?php echo SITE_URL; ?>/uploads/logos/<?php echo htmlspecialchars($logo_filename); ?>" 
-                         alt="<?php echo htmlspecialchars($business_name); ?>" height="40" class="me-2">
-                <?php else: ?>
-                    <span class="fw-bold fs-4 me-2"><?php echo htmlspecialchars($business_name); ?></span>
-                <?php endif; ?>
-            </a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
-                aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarMain">
-                <?php echo generate_menu('main-menu', $conn); ?>
-
-                <div class="d-flex align-items-center ms-lg-3 gap-2">
-                    <?php if (is_user_logged_in()): ?>
-                        <div class="dropdown">
-                            <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" id="userDropdown"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle me-1"></i> Account
-                            </a>
-                                <ul class="dropdown-menu shadow-medium border-0" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/dashboard.php"><i
-                                            class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/orders.php"><i
-                                            class="bi bi-bag-check me-2"></i>Orders</a></li>
-                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/user/profile.php"><i
-                                            class="bi bi-person me-2"></i>Profile</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>/auth/logout.php"><i
-                                            class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                            </ul>
-                        </div>
-                    <?php else: ?>
-                        <a href="<?php echo SITE_URL; ?>/auth/login.php" class="btn btn-outline-primary me-2">
-                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
-                        </a>
-                        <a href="<?php echo SITE_URL; ?>/auth/register.php" class="btn btn-primary d-none d-lg-inline-flex">
-                            Register
-                        </a>
-                    <?php endif; ?>
-
-                    <a href="<?php echo SITE_URL; ?>/cart/" class="btn btn-outline-primary btn-cart position-relative me-2">
-                        <i class="bi bi-cart3"></i>
-                        <span
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
-                            <span class="cart-item-count">0</span>
-                        </span>
-                    </a>
-
-
-                </div>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/customizable_header.php'; ?>
     <script>
         function changeLanguage(lang) {
             var iframe = document.getElementsByClassName('goog-te-menu-frame')[0];
